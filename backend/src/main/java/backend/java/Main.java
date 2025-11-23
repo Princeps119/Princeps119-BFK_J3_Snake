@@ -16,13 +16,13 @@ public class Main {
 
     public static final int PORT = 8080;
 
-    static void main() throws IOException {
+    public static void main( String[] args) throws IOException {
 
         try {
-            // Start HTTP server on port 8080
+            // Start HTTP server on port 8080, should stay open, warning can be ignored
             final ServerSocket serverSocket = new ServerSocket(PORT);
 
-            //run in perpetuity
+            //run in perpetuity, warning can be ignored
             while (true) {
 
                 Socket socket = serverSocket.accept();
@@ -37,12 +37,12 @@ public class Main {
                         }
 
                     } catch (IOException e) {
-                        logger.log(Level.WARNING, "Error processing request", e);
+                        logger.log(Level.SEVERE, "Error processing request", e);
                     }
                 }).start();
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "Error accepting connection", ex);
+            logger.log(Level.SEVERE, "Error accepting connection", ex);
         }
     }
 }
