@@ -2,12 +2,11 @@ package backend.java;
 
 
 import backend.java.controllers.MainController;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
@@ -16,33 +15,21 @@ public class Main {
 
     public static final int PORT = 8080;
 
-    public static void main( String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        try {
-            // Start HTTP server on port 8080, should stay open, warning can be ignored
-            final ServerSocket serverSocket = new ServerSocket(PORT);
+        server.createContext("/", exchange -> {
 
-            //run in perpetuity, warning can be ignored
-            while (true) {
+            Optional<String> response = MainController.processRequest(exchange);
 
-                Socket socket = serverSocket.accept();
-
-                new Thread(() -> {
-                    try {
-
-                        Optional<String> response = MainController.processRequest(socket);
-
-                        if (response.isPresent()) {
-                            socket.getOutputStream().write(response.get().getBytes());
-                        }
-
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "Error processing request", e);
-                    }
-                }).start();
+            if (response.isPresent()) {
+                exchange.sendResponseHeaders(200, response.get().getBytes().length);
+                exchange.getResponseBody().write(response.get().getBytes());
             }
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Error accepting connection", ex);
-        }
+        });
+
+        server.setExecutor(null);
+        server.start();
+        logger.info("Server running on port " + PORT);
     }
 }

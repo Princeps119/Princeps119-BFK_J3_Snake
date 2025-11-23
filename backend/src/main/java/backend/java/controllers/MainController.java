@@ -1,41 +1,39 @@
 package backend.java.controllers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
+import com.sun.net.httpserver.HttpExchange;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainController {
+
+    public static final Logger logger = Logger.getLogger(MainController.class.getName());
 
     private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/login", "/save", "/checkBackend"));
 
     private static final String POST = "POST";
     private static final String GET = "GET";
 
-    public static Optional<String> processRequest(Socket socket) throws IOException {
-
+    public static Optional<String> processRequest(final HttpExchange exchange) {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String request = reader.readLine();
 
-            // split request and parse it.
-            final String[] parts = request.split(" ");
-            final String method = parts[0];
-            final String path = parts[1];
+            final String method = exchange.getRequestMethod();
 
-            //todo Robin handle return value
-            checkMapping(path, method);
+            final String path = exchange.getRequestURI().getPath();
 
-        } catch (IOException e) {
-            socket.close();
-        } catch (IllegalArgumentException e){
+            logger.log(Level.INFO, "Request Method: {0}, Path: {1}",
+                    new Object[]{method, path});
+
+            return Optional.of(checkMapping(path, method));
+
+        } catch (IllegalArgumentException e) {
+            //invalid mappings
             return Optional.of(e.getMessage());
         }
-
-        return Optional.empty();
     }
 
     private static String checkMapping(final String path, final String method) throws IllegalArgumentException {
@@ -68,8 +66,20 @@ public class MainController {
     }
 
     private static String checkBackend(final String method) {
+
         if (method.equals(GET)) {
-            return "alive";
+            final String content = "alive";
+
+            final String headers = String.format(
+                    "HTTP/1.1 200 OK\r\n" +
+                            "Content-Type: text/plain; charset=utf-8\r\n" +
+                            "Content-Length: %d\r\n" +
+                            "\r\n",
+                    content.getBytes(StandardCharsets.UTF_8).length
+            );
+
+            return headers + content;
+
         } else {
             throw new IllegalArgumentException("Invalid method");
         }
