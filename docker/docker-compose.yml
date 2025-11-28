@@ -10,17 +10,39 @@ services:
       - "8080:8080"
     depends_on:
       - mongoDB
+    secrets:
+      - mongo_uri
+      - encryption_key
     environment:
-      MONGO_URI: mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27018/snake_userData
+      # Instead of hardcoding values, point to secret file paths
+      MONGO_URI_FILE: /run/secrets/mongo_uri
+      ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
 
   mongoDB:
     image: mongo:5
     restart: always
+
     environment:
       TZ: "Europe/Berlin"
       MONGO_INITDB_ROOT_USERNAME: snake_backend
       MONGO_INITDB_ROOT_PASSWORD: snakesLikeToHisss222
       MONGO_INITDB_DATABASE: snake_userData
     # for local development (ich musste 27018 freigeben, weil auf arbeitsrechener 27017 belegt ist)
+    container_name: mongoDB
     ports:
      - "27018:27017"
+
+  #access mongo db docker container:
+  #docker exec -it mongoDB bash
+  #mongosh "mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27017/snake_userData?authSource=admin"
+  #snake_userData> show collections
+  #find all documents:
+  #snake_userData> db.users.find({}, { _id: 1 })
+  #delete specific document via id:  db.users.deleteOne({ _id: ObjectId("692990015d9c7365c72d495b") });
+
+
+secrets:
+  MONGO_URI_FILE:
+    file: ../src/main/resources/mongo_uri.txt
+  encryptENCRYPTION_KEY_FILE:
+    file: ../src/main/resources/encryption.txt
