@@ -1,3 +1,3 @@
 package data;
 
-public record LoginData(String username, String mail, String password) {}
+public record LoginData(String mail, String password) {}
