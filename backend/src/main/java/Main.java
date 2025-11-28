@@ -1,7 +1,4 @@
-package backend.java;
-
-
-import backend.java.controllers.MainController;
+import controllers.MainController;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -22,9 +19,11 @@ public class Main {
 
             Optional<String> response = MainController.processRequest(exchange);
 
-            if (response.isPresent()) {
+            if (response.isPresent() && !response.get().equals("error")) {
                 exchange.sendResponseHeaders(200, response.get().getBytes().length);
                 exchange.getResponseBody().write(response.get().getBytes());
+            } else  {
+                exchange.sendResponseHeaders(404, 0);
             }
         });
 
