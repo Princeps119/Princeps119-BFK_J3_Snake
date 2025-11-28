@@ -4,9 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import services.LoginService;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +25,7 @@ public class MongoRepo {
             uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
         }
 
-        if (uri == null || uri.isBlank()) {
+        if (uri.isBlank()) {
 
             throw new IllegalStateException("MONGO_URI environment variable is not set!");
 

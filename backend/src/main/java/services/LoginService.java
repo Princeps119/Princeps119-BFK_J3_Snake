@@ -2,7 +2,6 @@ package services;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import controllers.MainController;
 import data.TokenData;
 import exceptions.UserNotFoundException;
 import org.bson.Document;
@@ -17,7 +16,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

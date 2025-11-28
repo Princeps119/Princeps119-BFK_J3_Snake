@@ -1,5 +1,5 @@
-import controllers.MainController;
 import com.sun.net.httpserver.HttpServer;
+import controllers.MainController;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

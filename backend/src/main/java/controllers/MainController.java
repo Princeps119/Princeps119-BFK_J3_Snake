@@ -4,15 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
 import data.TokenData;
-import org.bson.Document;
-import repository.MongoRepo;
 import services.LoginService;
 
 import javax.crypto.BadPaddingException;
