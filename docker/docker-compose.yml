@@ -1,0 +1,26 @@
+
+#to run from root: execute in Terminal docker-compose -f docker/docker-compose.yml up --build
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: snakebackendcontainer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongoDB
+    environment:
+      MONGO_URI: mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27018/snake_userData
+
+  mongoDB:
+    image: mongo:5
+    restart: always
+    environment:
+      TZ: "Europe/Berlin"
+      MONGO_INITDB_ROOT_USERNAME: snake_backend
+      MONGO_INITDB_ROOT_PASSWORD: snakesLikeToHisss222
+      MONGO_INITDB_DATABASE: snake_userData
+    # for local development
+    ports:
+     - "27018:27017"
