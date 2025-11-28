@@ -21,6 +21,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: snake_backend
       MONGO_INITDB_ROOT_PASSWORD: snakesLikeToHisss222
       MONGO_INITDB_DATABASE: snake_userData
-    # for local development
+    # for local development (ich musste 27018 freigeben, weil auf arbeitsrechener 27017 belegt ist)
     ports:
      - "27018:27017"
