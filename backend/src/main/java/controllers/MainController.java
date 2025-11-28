@@ -4,8 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
+import org.bson.Document;
+import repository.MongoRepo;
+import services.LoginService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,16 +100,21 @@ public class MainController {
                 }.getType();
                 final LoginData loginData = gson.fromJson(reader, loginType);
 
-                if (loginData != null) {
+                if (null != loginData) {
 
                     final String mail = loginData.mail();
                     final String password = loginData.password();
 
                     //todo check mail and pw against DB
+                    return LoginService.getInstance().checkLoginData(mail, password);
 
-                } else throw new IllegalArgumentException("Login data is null");
+                } else {
+                    logger.log(Level.SEVERE, "no user found loginData is null");
+                    throw new IllegalArgumentException("No user found");
+                }
 
-            }
+
+            } else throw new IllegalArgumentException("Login data is null");
 
         }
         return null;
