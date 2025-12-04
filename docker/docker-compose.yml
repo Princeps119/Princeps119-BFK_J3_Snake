@@ -1,5 +1,5 @@
 
-#to run from root: execute in Terminal docker-compose -f docker/docker-compose.yml up --build
+#to run from root: execute in Terminal docker-compose -f docker/docker-compose.yml up --build -d
 services:
   backend:
     build:
@@ -8,20 +8,23 @@ services:
     container_name: snakebackendcontainer
     ports:
       - "8080:8080"
+      - "5005:5005"       # <— expose debug port to host
+
     depends_on:
-      - mongoDB
+      mongoDB:
+        condition: service_healthy
     secrets:
       - MONGO_URI_FILE
       - ENCRYPTION_KEY_FILE
     environment:
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       # Instead of hardcoding values, point to secret file paths
-      MONGO_URI_FILE: /run/secrets/mongo_uri
-      ENCRYPTION_KEY_FILE: /run/secrets/encryption
+      MONGO_URI_FILE: /run/secrets/MONGO_URI_FILE
+      ENCRYPTION_KEY_FILE: /run/secrets/ENCRYPTION_KEY_FILE
 
   mongoDB:
     image: mongo:5
     restart: always
-
     environment:
       TZ: "Europe/Berlin"
       MONGO_INITDB_ROOT_USERNAME: snake_backend
@@ -31,6 +34,12 @@ services:
     container_name: mongoDB
     ports:
      - "27018:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
 
   #access mongo db docker container:
   #docker exec -it mongoDB bash
@@ -39,7 +48,6 @@ services:
   #find all documents:
   #snake_userData> db.users.find({}, { _id: 1 })
   #delete specific document via id:  db.users.deleteOne({ _id: ObjectId("692990015d9c7365c72d495b") });
-
 
 secrets:
   MONGO_URI_FILE:

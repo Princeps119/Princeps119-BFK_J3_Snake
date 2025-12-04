@@ -10,8 +10,12 @@ COPY pom.xml .
 COPY backend/src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Run with Amazon Corretto
+# Stage 2: Run with Amazon Corretto JRE
 FROM amazoncorretto:21
 WORKDIR /opt/exec
-COPY --from=build /app/target/*.jar app.jar
-CMD ["java", "-jar", "app.jar"]
+COPY --from=build /app/target/*.jar /opt/exec/app.jar
+COPY --from=build /app/target/lib /opt/exec/lib
+EXPOSE 8080 5005
+# Run with explicit classpath (app.jar + all jars in lib/)
+CMD ["java", "-cp", "/opt/exec/app.jar:/opt/exec/lib/*", "Main"]
+
