@@ -56,7 +56,7 @@ public class MainController {
         } catch (IllegalArgumentException | IOException e) {
             //invalid mappings
             logger.log(Level.WARNING, "Error processing request", e);
-            return Optional.of(false);
+            throw new IllegalArgumentException("Error processing request", e);
         }
     }
 
