@@ -11,12 +11,12 @@ services:
     depends_on:
       - mongoDB
     secrets:
-      - mongo_uri
-      - encryption_key
+      - MONGO_URI_FILE
+      - ENCRYPTION_KEY_FILE
     environment:
       # Instead of hardcoding values, point to secret file paths
       MONGO_URI_FILE: /run/secrets/mongo_uri
-      ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
+      ENCRYPTION_KEY_FILE: /run/secrets/encryption
 
   mongoDB:
     image: mongo:5
@@ -44,5 +44,5 @@ services:
 secrets:
   MONGO_URI_FILE:
     file: ../src/main/resources/mongo_uri.txt
-  encryptENCRYPTION_KEY_FILE:
+  ENCRYPTION_KEY_FILE:
     file: ../src/main/resources/encryption.txt
