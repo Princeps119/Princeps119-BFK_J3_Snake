@@ -43,6 +43,6 @@ services:
 
 secrets:
   MONGO_URI_FILE:
-    file: ../src/main/resources/mongo_uri.txt
+    file: ../backend/src/main/resources/mongo_uri.txt
   ENCRYPTION_KEY_FILE:
-    file: ../src/main/resources/encryption.txt
+    file: ../backend/src/main/resources/encryption.txt
