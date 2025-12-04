@@ -25,6 +25,7 @@ public class Main {
                }
            } catch (Exception e) {
                exchange.sendResponseHeaders(404, -1);
+               exchange.close();
            }
         });
 

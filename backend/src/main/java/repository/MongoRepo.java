@@ -20,11 +20,9 @@ public class MongoRepo {
     private final MongoDatabase userDB;
 
     private MongoRepo() {
-         String uri = System.getenv("MONGO_URI"); // von docker compose environment
-        if (uri == null) {
-            uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
-        }
+         String uri = "mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27017/snake_userData?authSource=admin";; // von docker compose environment
 
+          //use when running locally without docker  uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
         if (uri.isBlank()) {
 
             throw new IllegalStateException("MONGO_URI environment variable is not set!");

@@ -32,7 +32,7 @@ public class RegistrationService {
     }
 
     public Boolean register(RegisterData registerData) {
-
+//todo username handeling
         if (null == registerData || null == registerData.password() || null == registerData.email()) {
             logger.severe("Register data is null");
             throw new IllegalArgumentException("Register data is null");
