@@ -5,22 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="snake.css">
-    <title>Snake</title>
+    <title>🐍 Snake</title>
 </head>
 
 <body>
-    <div class="main-container">
-        <h1>Willkommen beim Snake Spiel</h1>
-        <span>Hallo <span id="username"></span></span>
-        <div class="button-group">
-            <a href="/frontend/login/login.html" class="btn">Login</a>
-            <p>Möchten Sie Ihren Highscore und aktuellen Spielstand speichern ? Dann jetzt <a
-                    href="/frontend/register/register.html" class="btn">registrieren</a> oder <a
-                    href="/frontend/login/login.html" class="btn">anmelden</a></p>
+    <!-- Dialog wird später über JS gesteuert. -->
+    <!-- End Game Message Dialog und Spielinformation  -->
+    <div class="dialog-container" id="dialog-root"></div>
 
+    <div class="main-container">
+        <div class="header">
+            <h1>Snake Spiel 🐍</h1>
+                <!-- <button onclick=showInformationDialog()>Open InformationDialog</button>
+                <button onclick=showEndScreen()>Open Endscreen</button> -->
+                <span>Hallo <span id="username">Spieler</span></span>
         </div>
-    </div>
-    <script src="snake.js"></script>
+
+        <div class="game-container">
+            <div class="score-board">
+                <p>Score: <span id="score">0</span></p>
+                <p>Highscore: <span id="highscore">0</span></p>
+            </div>
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Section wird später dann über JS gesteuert. -->
+        <div class="section" id="progress-section"></div>
+
+        <script src="/frontend/snake/js/snake.js"></script>
 </body>
 
 </html>
