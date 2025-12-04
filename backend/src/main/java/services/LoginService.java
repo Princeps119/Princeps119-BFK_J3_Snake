@@ -11,13 +11,13 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static services.Util.hashPassword;
 
 public class LoginService {
 
@@ -68,16 +68,5 @@ public class LoginService {
         }
         logger.log(Level.WARNING, "user not found");
         throw new UserNotFoundException("no document found");
-    }
-
-    public String hashPassword(String password) {
-       try {
-           MessageDigest digest = MessageDigest.getInstance("SHA-256");
-           byte[] hash = digest.digest(password.getBytes());
-           return Base64.getEncoder().encodeToString(hash);
-       } catch (NoSuchAlgorithmException e) {
-           logger.log(Level.SEVERE, "Error while encrypting password", e);
-       }
-       return null;
     }
 }

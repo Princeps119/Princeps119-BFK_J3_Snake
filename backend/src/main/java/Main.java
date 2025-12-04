@@ -4,6 +4,7 @@ import controllers.MainController;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
@@ -17,14 +18,14 @@ public class Main {
 
         server.createContext("/", exchange -> {
 
-            Optional<String> response = MainController.processRequest(exchange);
-
-            if (response.isPresent() && !response.get().equals("error")) {
-                exchange.sendResponseHeaders(200, response.get().getBytes().length);
-                exchange.getResponseBody().write(response.get().getBytes());
-            } else  {
-                exchange.sendResponseHeaders(404, 0);
-            }
+           try {
+               final Optional<Boolean> processedRequest = MainController.processRequest(exchange);
+               if (processedRequest.isPresent() && processedRequest.get() == true) {
+                   logger.log(Level.INFO, "Request processed");
+               }
+           } catch (Exception e) {
+               exchange.sendResponseHeaders(404, -1);
+           }
         });
 
         server.setExecutor(null);
