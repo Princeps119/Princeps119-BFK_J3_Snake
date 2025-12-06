@@ -2,6 +2,7 @@ package controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sun.net.httpserver.HttpExchange;
@@ -17,16 +18,21 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static services.Util.sendErrorResponse;
 
 public class MainController {
 
@@ -82,30 +88,39 @@ public class MainController {
 
 
     private static Boolean register(final String method, final HttpExchange exchange) throws IllegalArgumentException {
-        logger.log(Level.INFO, "in login Method");
         if (method.equals(POST) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
-            logger.log(Level.INFO, "in if in Login method");
             if (exchange.getRequestBody() != null) {
-
-                final JsonReader reader = createJsonReader(exchange);
-                final Gson gson = new GsonBuilder().create();
-                final Type registerType = new TypeToken<RegisterData>() {
-                }.getType();
-                final RegisterData registerData = gson.fromJson(reader, registerType);
-                final RegistrationService registrationService = RegistrationService.getInstance();
-
                 try {
+                    final JsonReader reader = createJsonReader(exchange);
+                    final Gson gson = new GsonBuilder().create();
+                    final Type registerType = new TypeToken<RegisterData>() {
+                    }.getType();
+                    final RegisterData registerData = gson.fromJson(reader, registerType);
+                    final RegistrationService registrationService = RegistrationService.getInstance();
+
                      if (registrationService.register(registerData)) {
-                         exchange.sendResponseHeaders(200, -1);
+                         exchange.sendResponseHeaders(204, -1);
                          exchange.close();
                          return true;
                      }
-                } catch (IllegalArgumentException | IOException e) {
-                    logger.log(Level.INFO, "invalid register", e);
-                }
 
+                } catch (IllegalArgumentException e) {
+                    logger.log(Level.WARNING, "illegal argument", e);
+                    sendErrorResponse(exchange, 400, e.getMessage());
+
+                } catch (JsonSyntaxException e) {
+                    logger.log(Level.WARNING, "JsonSyntaxException", e);
+                    sendErrorResponse(exchange, 400, "Invalid JSON format");
+
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Exception", e);
+                    sendErrorResponse(exchange, 500, "Internal server error");
+                }
+            } else {
+                sendErrorResponse(exchange, 400, "Request body is required");
             }
         }
+        logger.log(Level.WARNING, "no exception, and no success either");
         return false;
     }
 
@@ -119,67 +134,100 @@ public class MainController {
         return new JsonReader(new StringReader(body));
     }
 
+    private static boolean login(final String method, final HttpExchange exchange) {
+        // Validate request method first
+        if (!POST.equals(method)) {
+            sendErrorResponse(exchange, 405, "Method not allowed. Use POST.");
+            return false;
+        }
 
-    //todo Robin implement logic and Services
-    private static Boolean login(final String method, final HttpExchange exchange) throws IllegalArgumentException {
-        logger.log(Level.INFO, "in login Method");
-        if (method.equals(POST) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
-            logger.log(Level.INFO, "in if in Login method");
-            if (exchange.getRequestBody() != null) {
+        // Validate Content-Type header
+        List<String> contentTypes = exchange.getRequestHeaders().get("Content-Type");
+        if (contentTypes == null || !contentTypes.contains(CONTENT_TYPE_JSON)) {
+            sendErrorResponse(exchange, 415, "Content-Type must be application/json");
+            return false;
+        }
 
-                final JsonReader reader = createJsonReader(exchange);
-                final Gson gson = new GsonBuilder().create();
-                final Type loginType = new TypeToken<LoginData>() {}.getType();
+        // Validate request body exists
+        if (exchange.getRequestBody() == null) {
+            sendErrorResponse(exchange, 400, "Request body is required");
+            return false;
+        }
 
-                final LoginData loginData = gson.fromJson(reader, loginType);
-                logger.log(Level.INFO, "did read JSON: {0}", loginData.mail());
-                if (null != loginData) {
+        try {
+            // Parse and validate JSON
+            final JsonReader reader = createJsonReader(exchange);
+            final Gson gson = new GsonBuilder().create();
+            final Type loginType = new TypeToken<LoginData>() {
+            }.getType();
 
-                    final String mail = loginData.mail();
-                    final String password = loginData.password();
-                    logger.log(Level.INFO, "got the login data: {0}", mail);
-                    final LoginService loginService = LoginService.getInstance();
+            final LoginData loginData = gson.fromJson(reader, loginType);
 
-                    TokenData token = null;
-                    try {
-                        token = loginService.checkLoginData(mail, password);
-                    } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException
-                             | BadPaddingException | InvalidKeyException
-                            e) {
-                        logger.log(Level.WARNING, "failed to check login data", e);
-                    }
-                    if (null != token) {
-                        //todo better not send a String but the Token directly
+            // Validate required fields
+            if (loginData == null) {
+                sendErrorResponse(exchange, 400, "Invalid JSON: cannot parse login data");
+                return false;
+            }
 
-                        // Create Gson instance
-                        Gson gson2 = new Gson();
+            final String mail = loginData.mail();
+            final String password = loginData.password();
 
-                        // Convert to JSON
-                        String json = gson2.toJson(token);
-                        logger.log(Level.INFO, "sent token: " + json);
+            if (mail == null || mail.trim().isEmpty()) {
+                sendErrorResponse(exchange, 400, "Email is required");
+                return false;
+            }
 
-                        try {
-                            exchange.sendResponseHeaders(200, json.getBytes().length);
-                            exchange.getResponseBody().write(json.getBytes());
-                            exchange.getResponseBody().close();
-                            return true;
-                        } catch (IllegalArgumentException | IOException e) {
-                            logger.log(Level.WARNING, "failed to send token", e);
-                        }
+            if (password == null || password.trim().isEmpty()) {
+                sendErrorResponse(exchange, 400, "Password is required");
+                return false;
+            }
 
-                    } else {
-                        logger.log(Level.SEVERE, "Error in login, most likely with encryption for Logindata: " + mail + " " + password);
-                    }
+            logger.log(Level.INFO, "Processing login for: {0}", mail);
 
-                } else {
-                    logger.log(Level.SEVERE, "no user found loginData is null");
-                    throw new IllegalArgumentException("No user found");
-                }
-            } else throw new IllegalArgumentException("Login data is null");
+            // Authenticate user
+            final LoginService loginService = LoginService.getInstance();
+            TokenData token;
 
-        } else throw new IllegalArgumentException("Login data is null");
+            try {
+                token = loginService.checkLoginData(mail, password);
+            } catch (NoSuchPaddingException | IllegalBlockSizeException |
+                     NoSuchAlgorithmException | BadPaddingException |
+                     InvalidKeyException e) {
+                logger.log(Level.WARNING, "Encryption error during login", e);
+                sendErrorResponse(exchange, 500, "Authentication service error");
+                return false;
+            }
 
-        return null;
+            if (token == null) {
+                sendErrorResponse(exchange, 401, "Invalid email or password");
+                return false;
+            }
+
+            // Success - send token
+            final String jsonResponse = gson.toJson(token);
+            final byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, responseBytes.length);
+
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+
+            logger.log(Level.INFO, "Login successful for: {0}", mail);
+            return true;
+
+        } catch (JsonSyntaxException e) {
+            logger.log(Level.WARNING, "Invalid JSON in login request", e);
+            sendErrorResponse(exchange, 400, "Invalid JSON format");
+            return false;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error during login", e);
+            sendErrorResponse(exchange, 500, "Internal server error");
+            return false;
+        } finally {
+            exchange.close();
+        }
     }
 
     private static Boolean save(final String method, HttpExchange exchange) {
@@ -187,8 +235,6 @@ public class MainController {
         return false;
     }
 
-    //todo think if any of these logic methods even have to have a return type or just do void and handle the exchange inside the method itself
-    //instead of the main method
     private static Boolean checkBackend(final String method, final HttpExchange exchange) throws IllegalArgumentException {
 
         if (method.equals(GET)) {

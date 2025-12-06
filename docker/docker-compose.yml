@@ -46,6 +46,7 @@ services:
   #snake_userData> show collections
   #find all documents:
   #snake_userData> db.users.find({}, { _id: 1 })
+  # to see the mail too: db.users.find({}, { _id: 1 , mail: 1})
   #delete specific document via id:  db.users.deleteOne({ _id: ObjectId("692990015d9c7365c72d495b") });
 
 secrets:

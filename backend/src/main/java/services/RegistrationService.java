@@ -6,6 +6,7 @@ import data.RegisterData;
 import org.bson.Document;
 import repository.MongoRepo;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -32,13 +33,13 @@ public class RegistrationService {
     }
 
     public Boolean register(RegisterData registerData) {
-//todo username handeling
-        if (null == registerData || null == registerData.password() || null == registerData.email()) {
+
+        if (null == registerData || null == registerData.password() || null == registerData.mail()) {
             logger.severe("Register data is null");
             throw new IllegalArgumentException("Register data is null");
         }
 
-        Optional<Document> foundDocument = Optional.ofNullable(userCollection.find(Filters.eq("mail", registerData.email())).first());
+        Optional<Document> foundDocument = Optional.ofNullable(userCollection.find(Filters.eq("mail", registerData.mail())).first());
 
         if (foundDocument.isPresent()) {
             logger.severe("user already exists");
@@ -48,23 +49,30 @@ public class RegistrationService {
             if (checkEmailAndPassword(registerData)) {
 
                 final String hashedPassword = hashPassword(registerData.password());
-                userCollection.insertOne(new Document(registerData.email(), hashedPassword));
+                final Document doc = new Document()
+                        .append("username", registerData.username())
+                        .append("mail", registerData.mail())
+                        .append("hashedPassword", hashedPassword)
+                        .append("createdAt", new Date());
+                userCollection.insertOne(doc);
+
                 return true;
 
             } else  {
-                logger.severe("Invalid email or password");
-                throw new IllegalArgumentException("Invalid email or password");
+                logger.severe("Invalid mail or password");
+                throw new IllegalArgumentException("Invalid mail or password");
             }
         }
     }
 
     private boolean checkEmailAndPassword(RegisterData registerData) {
 
-        return (registerData.email().contains("@") &&
+        return (registerData.mail().contains("@") &&
+                registerData.mail().length() < 25 &&
+                registerData.username().length() < 20 &&
                 registerData.password().length() > 8 &&
                 hasLowerAndUpper(registerData.password()));
     }
-
 
     public static boolean hasLowerAndUpper(String password) {
         boolean hasLower = false;
@@ -84,5 +92,4 @@ public class RegistrationService {
         }
         return false;
     }
-
 }
