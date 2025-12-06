@@ -1,0 +1,254 @@
+package controllers;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.sun.net.httpserver.HttpExchange;
+import data.LoginData;
+import data.RegisterData;
+import data.TokenData;
+import services.LoginService;
+import services.RegistrationService;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static services.Util.sendErrorResponse;
+
+public class MainController {
+
+    public static final Logger logger = Logger.getLogger(MainController.class.getName());
+
+    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register"));
+
+    private static final String POST = "POST";
+    private static final String GET = "GET";
+    private static final String PUT = "PUT";
+    private static final String DELETE = "DELETE";
+
+    private static final String CONTENT_TYPE_JSON = "application/json";
+
+    public static Optional<Boolean> processRequest(final HttpExchange exchange) {
+        try {
+
+            final String method = exchange.getRequestMethod();
+
+            final String path = exchange.getRequestURI().getPath();
+
+            logger.log(Level.INFO, "Request Method: {0}, Path: {1}",
+                    new Object[]{method, path});
+
+            return Optional.of(checkMapping(path, method, exchange));
+
+        } catch (IllegalArgumentException | IOException e) {
+            //invalid mappings
+            logger.log(Level.WARNING, "Error processing request", e);
+            throw new IllegalArgumentException("Error processing request", e);
+        }
+    }
+
+    private static Boolean checkMapping(final String path, final String method, final HttpExchange exchange) throws IllegalArgumentException, IOException {
+
+        if (mapping.contains(path)) {
+            logger.log(Level.INFO, "Mapping found for {0}", path);
+            final int mappedPath = mapping.indexOf(path);
+            switch (mappedPath) {
+                case 0:
+                    return login(method, exchange);
+                case 1:
+                    return save(method, exchange);
+                case 2:
+                    return checkBackend(method, exchange);
+                case 3:
+                    return register(method, exchange);
+
+            }
+        }
+        throw new IllegalArgumentException("Invalid path");
+    }
+
+
+    private static Boolean register(final String method, final HttpExchange exchange) throws IllegalArgumentException {
+        if (method.equals(POST) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
+            if (exchange.getRequestBody() != null) {
+                try {
+                    final JsonReader reader = createJsonReader(exchange);
+                    final Gson gson = new GsonBuilder().create();
+                    final Type registerType = new TypeToken<RegisterData>() {
+                    }.getType();
+                    final RegisterData registerData = gson.fromJson(reader, registerType);
+                    final RegistrationService registrationService = RegistrationService.getInstance();
+
+                     if (registrationService.register(registerData)) {
+                         exchange.sendResponseHeaders(204, -1);
+                         exchange.close();
+                         return true;
+                     }
+
+                } catch (IllegalArgumentException e) {
+                    logger.log(Level.WARNING, "illegal argument", e);
+                    sendErrorResponse(exchange, 400, e.getMessage());
+
+                } catch (JsonSyntaxException e) {
+                    logger.log(Level.WARNING, "JsonSyntaxException", e);
+                    sendErrorResponse(exchange, 400, "Invalid JSON format");
+
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Exception", e);
+                    sendErrorResponse(exchange, 500, "Internal server error");
+                }
+            } else {
+                sendErrorResponse(exchange, 400, "Request body is required");
+            }
+        }
+        logger.log(Level.WARNING, "no exception, and no success either");
+        return false;
+    }
+
+    private static JsonReader createJsonReader(HttpExchange exchange) {
+        final String body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
+                .lines()
+                .collect(Collectors.joining("\n"));
+
+        logger.log(Level.INFO, "got RequestBody: {0}", body);
+
+        return new JsonReader(new StringReader(body));
+    }
+
+    private static boolean login(final String method, final HttpExchange exchange) {
+        // Validate request method first
+        if (!POST.equals(method)) {
+            sendErrorResponse(exchange, 405, "Method not allowed. Use POST.");
+            return false;
+        }
+
+        // Validate Content-Type header
+        List<String> contentTypes = exchange.getRequestHeaders().get("Content-Type");
+        if (contentTypes == null || !contentTypes.contains(CONTENT_TYPE_JSON)) {
+            sendErrorResponse(exchange, 415, "Content-Type must be application/json");
+            return false;
+        }
+
+        // Validate request body exists
+        if (exchange.getRequestBody() == null) {
+            sendErrorResponse(exchange, 400, "Request body is required");
+            return false;
+        }
+
+        try {
+            // Parse and validate JSON
+            final JsonReader reader = createJsonReader(exchange);
+            final Gson gson = new GsonBuilder().create();
+            final Type loginType = new TypeToken<LoginData>() {
+            }.getType();
+
+            final LoginData loginData = gson.fromJson(reader, loginType);
+
+            // Validate required fields
+            if (loginData == null) {
+                sendErrorResponse(exchange, 400, "Invalid JSON: cannot parse login data");
+                return false;
+            }
+
+            final String mail = loginData.mail();
+            final String password = loginData.password();
+
+            if (mail == null || mail.trim().isEmpty()) {
+                sendErrorResponse(exchange, 400, "Email is required");
+                return false;
+            }
+
+            if (password == null || password.trim().isEmpty()) {
+                sendErrorResponse(exchange, 400, "Password is required");
+                return false;
+            }
+
+            logger.log(Level.INFO, "Processing login for: {0}", mail);
+
+            // Authenticate user
+            final LoginService loginService = LoginService.getInstance();
+            TokenData token;
+
+            try {
+                token = loginService.checkLoginData(mail, password);
+            } catch (NoSuchPaddingException | IllegalBlockSizeException |
+                     NoSuchAlgorithmException | BadPaddingException |
+                     InvalidKeyException e) {
+                logger.log(Level.WARNING, "Encryption error during login", e);
+                sendErrorResponse(exchange, 500, "Authentication service error");
+                return false;
+            }
+
+            if (token == null) {
+                sendErrorResponse(exchange, 401, "Invalid email or password");
+                return false;
+            }
+
+            // Success - send token
+            final String jsonResponse = gson.toJson(token);
+            final byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, responseBytes.length);
+
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+
+            logger.log(Level.INFO, "Login successful for: {0}", mail);
+            return true;
+
+        } catch (JsonSyntaxException e) {
+            logger.log(Level.WARNING, "Invalid JSON in login request", e);
+            sendErrorResponse(exchange, 400, "Invalid JSON format");
+            return false;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error during login", e);
+            sendErrorResponse(exchange, 500, "Internal server error");
+            return false;
+        } finally {
+            exchange.close();
+        }
+    }
+
+    private static Boolean save(final String method, HttpExchange exchange) {
+
+        return false;
+    }
+
+    private static Boolean checkBackend(final String method, final HttpExchange exchange) throws IllegalArgumentException {
+
+        if (method.equals(GET)) {
+            try {
+                exchange.sendResponseHeaders(200, -1);
+                exchange.close();
+                return true;
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "invalid request", e);
+            }
+
+        } else {
+            throw new IllegalArgumentException("Invalid method");
+        }
+        return false;
+    }
+}

@@ -1,12 +1,10 @@
-package backend.java;
-
-
-import backend.java.controllers.MainController;
 import com.sun.net.httpserver.HttpServer;
+import controllers.MainController;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
@@ -20,12 +18,15 @@ public class Main {
 
         server.createContext("/", exchange -> {
 
-            Optional<String> response = MainController.processRequest(exchange);
-
-            if (response.isPresent()) {
-                exchange.sendResponseHeaders(200, response.get().getBytes().length);
-                exchange.getResponseBody().write(response.get().getBytes());
-            }
+           try {
+               final Optional<Boolean> processedRequest = MainController.processRequest(exchange);
+               if (processedRequest.isPresent() && processedRequest.get() == true) {
+                   logger.log(Level.INFO, "Request processed");
+               }
+           } catch (Exception e) {
+               exchange.sendResponseHeaders(404, -1);
+               exchange.close();
+           }
         });
 
         server.setExecutor(null);
