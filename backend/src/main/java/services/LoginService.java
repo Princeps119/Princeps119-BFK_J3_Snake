@@ -21,7 +21,9 @@ import static services.Util.hashPassword;
 
 public class LoginService {
 
-    public static final Logger logger = Logger.getLogger(LoginService.class.getName());
+    private static final Logger logger = Logger.getLogger(LoginService.class.getName());
+    private static final String USER_COLLECTION_NAME = "users";
+    private static final MongoRepo userDB = MongoRepo.getInstance();
 
     private static LoginService instance;
     private final MongoCollection<Document> userCollection;
@@ -34,8 +36,6 @@ public class LoginService {
     }
 
     private LoginService() {
-            final MongoRepo userDB = MongoRepo.getInstance();
-            final String USER_COLLECTION_NAME = "users";
             this.userCollection = userDB.getUserCollection(USER_COLLECTION_NAME);
     }
 
@@ -58,7 +58,7 @@ public class LoginService {
                         final Instant timestamp = Instant.now();
                         final String userMail = optDbMail.get();
 
-                        return new TokenData(loadedUsername, TokenEncrypter.encrypt(userMail), timestamp.toString());
+                        return new TokenData(loadedUsername, services.TokenEncrypter.encrypt(userMail), timestamp.toString());
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error while encrypting username and password", e);
                         return null;

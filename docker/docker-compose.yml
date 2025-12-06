@@ -40,7 +40,6 @@ services:
       timeout: 5s
       retries: 6
 
-
   #access mongo db docker container:
   #docker exec -it mongoDB bash
   #mongosh "mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27017/snake_userData?authSource=admin"
@@ -51,6 +50,6 @@ services:
 
 secrets:
   MONGO_URI_FILE:
-    file: ../backend/src/main/resources/mongo_uri.txt
+    file: ../backend/src/main/resources/uri.txt
   ENCRYPTION_KEY_FILE:
     file: ../backend/src/main/resources/encryption.txt

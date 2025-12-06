@@ -6,6 +6,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -15,23 +19,33 @@ import java.util.logging.Logger;
 
 public class MongoRepo {
 
+    private static final Path SECRET_PATH = Paths.get("/run/secrets/MONGO_URI_FILE");// von docker compose environment
+
     private static MongoRepo instance;
-    private final MongoClient mongoClient;
     private final MongoDatabase userDB;
 
     private MongoRepo() {
-         String uri = "mongodb://snake_backend:snakesLikeToHisss222@mongoDB:27017/snake_userData?authSource=admin";; // von docker compose environment
+        MongoDatabase database;
+        MongoClient client;
+        try {
+            final String uri = Files.readString(SECRET_PATH).trim();
 
-          //use when running locally without docker  uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
-        if (uri.isBlank()) {
+            //use when running locally without docker  uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
+            if (uri.isBlank()) {
 
-            throw new IllegalStateException("MONGO_URI environment variable is not set!");
+                throw new IllegalStateException("MONGO_URI environment variable is not set!");
 
-        } else {
-            mongoClient = MongoClients.create(uri);
-            userDB = mongoClient.getDatabase("snake_userData");
+            } else {
+                client = MongoClients.create(uri);
+                database = client.getDatabase("snake_userData");
+            }
+        } catch (IOException e) {
+            final String uri = "mongodb://snake_backend:snakesLikeToHisss222@localhost:27018/snake_userData?authSource=admin";
+            client = MongoClients.create(uri);
+            database = client.getDatabase("snake_userData");
         }
 
+        userDB = database;
     }
 
     public static synchronized MongoRepo getInstance() {
