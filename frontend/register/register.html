@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="register.css">
+    <title>Registrierung</title>
+</head>
+
+<body>
+    <div class="register-container">
+        <h1>Registrierung</h1>
+        <div class="success" id="successMsg">Registrierung erfolgreich! Sie werden gleich weitergeleitet</div>
+
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="username">Benutzername</label>
+                <input type="text" id="username" name="username" required>
+                <div class="error" id="usernameError">Benutzername muss mindestens 3 Zeichen lang sein</div>
+            </div>
+
+            <div class="input-group">
+                <label for="email">E-Mail</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError">Bitte geben Sie eine gültige E-Mail ein</div>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Passwort</label>
+                <input type="password" id="password" name="password" required>
+                <div class="error" id="passwordError">Passwort muss mindestens 6 Zeichen lang sein</div>
+            </div>
+
+            <div class="input-group">
+                <label for="confirmPassword">Passwort wiederholen</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="error" id="confirmPasswordError">Passwörter stimmen nicht überein</div>
+            </div>
+
+            <button type="submit">Registrieren</button>
+        </form>
+
+        <div class="footer">
+            <p>Schon registriert? -><a href="/frontend/login/login.html" id="login-link">Jetzt anmelden</a></p>
+        </div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+
+</html>
