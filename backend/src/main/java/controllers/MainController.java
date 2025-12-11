@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
 import data.RegisterData;
 import data.TokenData;
+import services.DeletionService;
 import services.LoginService;
 import services.RegistrationService;
 
@@ -38,7 +39,7 @@ public class MainController {
 
     public static final Logger logger = Logger.getLogger(MainController.class.getName());
 
-    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register"));
+    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register", "/api/delete"));
 
     private static final String POST = "POST";
     private static final String GET = "GET";
@@ -68,7 +69,9 @@ public class MainController {
 
     private static Boolean checkMapping(final String path, final String method, final HttpExchange exchange) throws IllegalArgumentException, IOException {
 
-        if (mapping.contains(path)) {
+        final String checkedPath = checkPath(path, exchange);
+
+        if (mapping.contains(checkedPath)) {
             logger.log(Level.INFO, "Mapping found for {0}", path);
             final int mappedPath = mapping.indexOf(path);
             switch (mappedPath) {
@@ -80,12 +83,47 @@ public class MainController {
                     return checkBackend(method, exchange);
                 case 3:
                     return register(method, exchange);
+                case 4:
+                    return delete(path, method, exchange);
 
             }
         }
         throw new IllegalArgumentException("Invalid path");
     }
 
+    private static String checkPath(final String path, final HttpExchange exchange) {
+
+        long slashCount = path.chars().filter(ch -> ch == '/').count();
+
+        if (slashCount == 3) {
+            // Remove everything from the last slash onwards
+            int lastSlash = path.lastIndexOf('/');
+            return path.substring(0, lastSlash);
+        } else if (slashCount == 2) {
+            return path;
+        } else {
+            sendErrorResponse(exchange, 400, "Invalid JSON format");
+        }
+        sendErrorResponse(exchange, 400, "Invalid JSON format");
+        return path;
+    }
+
+    private static Boolean delete(final String path , final String method, final HttpExchange exchange) {
+
+        if (method.equals(DELETE)) {
+            try {
+                final DeletionService deletionService = DeletionService.getInstance();
+                final boolean didDelete = deletionService.deleteUser(exchange);
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+                return didDelete;
+            } catch(IOException e) {
+                sendErrorResponse(exchange, 400, "Error deleting user");
+
+            }
+        }
+        return false;
+    }
 
     private static Boolean register(final String method, final HttpExchange exchange) throws IllegalArgumentException {
         if (method.equals(POST) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
@@ -124,7 +162,7 @@ public class MainController {
         return false;
     }
 
-    private static JsonReader createJsonReader(HttpExchange exchange) {
+    public static JsonReader createJsonReader(HttpExchange exchange) {
         final String body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
                 .lines()
                 .collect(Collectors.joining("\n"));

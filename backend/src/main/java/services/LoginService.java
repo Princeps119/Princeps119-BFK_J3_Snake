@@ -39,7 +39,6 @@ public class LoginService {
             this.userCollection = userDB.getUserCollection(USER_COLLECTION_NAME);
     }
 
-
     public TokenData checkLoginData(final String mail, final String password) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         logger.log(Level.INFO, "in checkLoginData");
         Document foundDocument = userCollection.find(Filters.eq("mail", mail)).first();

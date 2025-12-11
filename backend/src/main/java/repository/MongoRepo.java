@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class MongoRepo {
         //cannot check for null for that collection as is created lazily and will always return an obj for userDB.getCollection("users")
         if (!exists) {
             userDB.createCollection("users");
+            userDB.getCollection("users").createIndex(new Document("mail", 1), new IndexOptions().unique(true));
 
             createExampleUser();
         }
