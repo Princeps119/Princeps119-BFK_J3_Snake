@@ -63,13 +63,12 @@ public class Util {
 
             byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
 
-            // Set proper headers, including CORS so browsers accept the response, see Main
+            // Set proper headers, including CORS so browsers accept the response, see Main, do not need to set them again here
+            // or new cors as the original header will not be removed
             var headers = exchange.getResponseHeaders();
-            headers.get("Content-Type").remove(CONTENT_TYPE_JSON);
-//            headers.add("Access-Control-Allow-Origin", "*");
-//            headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-//            headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//            headers.add("Access-Control-Max-Age", "3600");
+            if (headers.containsKey("Content-Type")) {
+                headers.get("Content-Type").remove(CONTENT_TYPE_JSON);
+            }
             headers.set("Content-Type", "application/problem+json");
             exchange.sendResponseHeaders(statusCode, responseBytes.length);
 
