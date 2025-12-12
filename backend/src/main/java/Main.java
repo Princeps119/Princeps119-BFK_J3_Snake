@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static services.Util.sendErrorResponse;
+
 public class Main {
 
     public static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -38,8 +40,8 @@ public class Main {
                    logger.log(Level.INFO, "Request processed");
                }
            } catch (Exception e) {
-               exchange.sendResponseHeaders(404, -1);
-               exchange.close();
+               logger.log(Level.WARNING, "Unhandled exception while processing request", e);
+               sendErrorResponse(exchange, 500, "Internal server error");
            }
         });
 
