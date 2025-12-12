@@ -8,8 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static controllers.MainController.CONTENT_TYPE_JSON;
+import static controllers.MainController.POST;
 
 public class Util {
 
@@ -26,6 +30,28 @@ public class Util {
         return null;
     }
 
+    public static boolean validateInputs(String method, HttpExchange exchange) {
+        // Validate request method first
+        if (!POST.equals(method)) {
+            sendErrorResponse(exchange, 405, "Method not allowed. Use POST.");
+            return false;
+        }
+
+        // Validate Content-Type header
+        List<String> contentTypes = exchange.getRequestHeaders().get("Content-Type");
+        if (contentTypes == null || !contentTypes.contains(CONTENT_TYPE_JSON)) {
+            sendErrorResponse(exchange, 415, "Content-Type must be application/json");
+            return false;
+        }
+
+        // Validate request body exists
+        if (exchange.getRequestBody() == null) {
+            sendErrorResponse(exchange, 400, "Request body is required");
+            return false;
+        }
+        return true;
+    }
+
     public static void sendErrorResponse(final HttpExchange exchange,
                                          final int statusCode,
                                          final String errorMsg) {
@@ -37,8 +63,13 @@ public class Util {
 
             byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
 
-            // Set proper headers
-            exchange.getResponseHeaders().set("Content-Type", "application/problem+json");
+            // Set proper headers, including CORS so browsers accept the response, see Main
+            var headers = exchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin", "*");
+            headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            headers.add("Access-Control-Max-Age", "3600");
+            headers.set("Content-Type", "application/problem+json");
             exchange.sendResponseHeaders(statusCode, responseBytes.length);
 
             // Use try-with-resources to prevent leaks

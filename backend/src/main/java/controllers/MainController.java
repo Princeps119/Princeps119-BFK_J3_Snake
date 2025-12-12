@@ -3,7 +3,6 @@ package controllers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
@@ -20,19 +19,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static services.Util.sendErrorResponse;
+import static services.Util.validateInputs;
 
 public class MainController {
 
@@ -40,12 +38,12 @@ public class MainController {
 
     private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register"));
 
-    private static final String POST = "POST";
-    private static final String GET = "GET";
-    private static final String PUT = "PUT";
-    private static final String DELETE = "DELETE";
+    public static final String POST = "POST";
+    public static final String GET = "GET";
+    public static final String PUT = "PUT";
+    public static final String DELETE = "DELETE";
 
-    private static final String CONTENT_TYPE_JSON = "application/json";
+    public static final String CONTENT_TYPE_JSON = "application/json";
 
     public static Optional<Boolean> processRequest(final HttpExchange exchange) {
         try {
@@ -86,16 +84,11 @@ public class MainController {
         throw new IllegalArgumentException("Invalid path");
     }
 
-
     private static Boolean register(final String method, final HttpExchange exchange) throws IllegalArgumentException {
         if (method.equals(POST) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
             if (exchange.getRequestBody() != null) {
                 try {
-                    final JsonReader reader = createJsonReader(exchange);
-                    final Gson gson = new GsonBuilder().create();
-                    final Type registerType = new TypeToken<RegisterData>() {
-                    }.getType();
-                    final RegisterData registerData = gson.fromJson(reader, registerType);
+                    final RegisterData registerData = readJSON(exchange, RegisterData.class);
                     final RegistrationService registrationService = RegistrationService.getInstance();
 
                      if (registrationService.register(registerData)) {
@@ -135,33 +128,14 @@ public class MainController {
     }
 
     private static boolean login(final String method, final HttpExchange exchange) {
-        // Validate request method first
-        if (!POST.equals(method)) {
-            sendErrorResponse(exchange, 405, "Method not allowed. Use POST.");
-            return false;
-        }
 
-        // Validate Content-Type header
-        List<String> contentTypes = exchange.getRequestHeaders().get("Content-Type");
-        if (contentTypes == null || !contentTypes.contains(CONTENT_TYPE_JSON)) {
-            sendErrorResponse(exchange, 415, "Content-Type must be application/json");
-            return false;
-        }
-
-        // Validate request body exists
-        if (exchange.getRequestBody() == null) {
-            sendErrorResponse(exchange, 400, "Request body is required");
+        if (!validateInputs(method, exchange)) {
             return false;
         }
 
         try {
             // Parse and validate JSON
-            final JsonReader reader = createJsonReader(exchange);
-            final Gson gson = new GsonBuilder().create();
-            final Type loginType = new TypeToken<LoginData>() {
-            }.getType();
-
-            final LoginData loginData = gson.fromJson(reader, loginType);
+            final LoginData loginData = readJSON(exchange, LoginData.class);
 
             // Validate required fields
             if (loginData == null) {
@@ -204,6 +178,7 @@ public class MainController {
             }
 
             // Success - send token
+            final Gson gson = new GsonBuilder().create();
             final String jsonResponse = gson.toJson(token);
             final byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
 
@@ -250,5 +225,11 @@ public class MainController {
             throw new IllegalArgumentException("Invalid method");
         }
         return false;
+    }
+
+    private static <T> T readJSON(final HttpExchange exchange, Class<T> clazz) {
+        final JsonReader reader = createJsonReader(exchange);
+        final Gson gson = new GsonBuilder().create();
+        return gson.fromJson(reader, clazz);
     }
 }
