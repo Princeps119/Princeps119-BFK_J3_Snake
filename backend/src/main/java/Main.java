@@ -18,9 +18,23 @@ public class Main {
 
         server.createContext("/", exchange -> {
 
+           // CORS: add headers for all responses, as test with Postman did work, but the Browsertest did not
+           var headers = exchange.getResponseHeaders();
+           headers.add("Access-Control-Allow-Origin", "*"); // Erlaubt Anfragen von allen Domains in productive noch auf domain einschränken
+           headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS"); // Gibt an, welche HTTP-Methoden für Cross-Origin-Anfragen erlaubt sind.
+           headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Definiert, welche benutzerdefinierten Header in der Anfrage erlaubt sind.
+           headers.add("Access-Control-Max-Age", "3600"); // Gibt an, wie lange das Ergebnis des Preflight-Checks (OPTIONS) gecacht werden darf (in Sekunden).
+
+           // needed as for POST a browser may send an Options first to check connection
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+                return;
+            }
+
            try {
                final Optional<Boolean> processedRequest = MainController.processRequest(exchange);
-               if (processedRequest.isPresent() && processedRequest.get() == true) {
+               if (processedRequest.isPresent() && processedRequest.get()) {
                    logger.log(Level.INFO, "Request processed");
                }
            } catch (Exception e) {
