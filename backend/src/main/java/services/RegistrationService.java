@@ -68,8 +68,6 @@ public class RegistrationService {
     private boolean checkEmailAndPassword(RegisterData registerData) {
 
         return (registerData.mail().contains("@") &&
-                registerData.mail().length() < 25 &&
-                registerData.username().length() < 20 &&
                 registerData.password().length() > 8 &&
                 hasLowerAndUpper(registerData.password()));
     }
