@@ -66,8 +66,10 @@ public class DeletionService {
         }
 
         String decryptedMail;
+        String decryptedTimestamp;
         try {
             decryptedMail = TokenEncrypter.decrypt(tokenData.encryptedMail());
+            decryptedTimestamp = TokenEncrypter.decrypt(tokenData.timestamp());
         } catch (Exception e) {
             sendErrorResponse(exchange, 400, "Invalid token encryption");
             return false;
@@ -75,7 +77,7 @@ public class DeletionService {
 
         // check timestamp
         try {
-            Instant tokenTime = Instant.parse(tokenData.timestamp());
+            Instant tokenTime = Instant.parse(decryptedTimestamp);
             if (Duration.between(tokenTime, Instant.now()).toHours() > 4) {
                 sendErrorResponse(exchange, 401, "Token expired");
                 return false;
@@ -89,5 +91,4 @@ public class DeletionService {
         logger.log(Level.INFO, "Deleted user with mail {0}", decryptedMail);
         return true;
     }
-
 }

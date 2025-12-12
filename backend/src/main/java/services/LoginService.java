@@ -57,7 +57,7 @@ public class LoginService {
                         final Instant timestamp = Instant.now();
                         final String userMail = optDbMail.get();
 
-                        return new TokenData(loadedUsername, services.TokenEncrypter.encrypt(userMail), timestamp.toString());
+                        return new TokenData(loadedUsername, services.TokenEncrypter.encrypt(userMail), services.TokenEncrypter.encrypt(timestamp.toString()));
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error while encrypting username and password", e);
                         return null;
