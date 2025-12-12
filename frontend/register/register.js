@@ -34,6 +34,8 @@ form.addEventListener("submit", async (e) => {
     isValid = false;
   }
 
+  console.log("Validation result:", isValid);
+
   if (isValid) {
     try {
       const response = await fetch("http://localhost:8080/api/register", {
@@ -43,22 +45,19 @@ form.addEventListener("submit", async (e) => {
         },
         body: JSON.stringify({
           username: usernameInput.value,
-          email: emailInput.value,
+          mail: emailInput.value,
           password: passwordInput.value,
         }),
       });
 
-      const data = await response.json();
+      console.log("Response status:", response);
 
       if (response.ok) {
         successMsg.style.display = "block";
         form.reset();
-        localStorage.setItem("username", result.username);
-        //token wird zurückgesendet vom backend. und dieser wird dann benutzt, damit man sich nicht nochmal anmelden muss.
-        //logik muss hier noch eingebunden werden.
-        setTimeout(() => (window.location.href = "snake.html"), 2000);
+        setTimeout(() => (window.location.href = "/frontend/login/login.html"), 2000);
       } else {
-        alert("Fehler: " + (data.message || "Registrierung fehlgeschlagen"));
+        alert("Fehler: Registrierung fehlgeschlagen");
       }
     } catch (error) {
       alert("Fehler beim Verbinden mit dem Server: " + error.message);
