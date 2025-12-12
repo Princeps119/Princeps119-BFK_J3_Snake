@@ -84,7 +84,7 @@ public class MainController {
                 case 3:
                     return register(method, exchange);
                 case 4:
-                    return delete(path, method, exchange);
+                    return delete(method, exchange);
 
             }
         }
@@ -108,7 +108,7 @@ public class MainController {
         return path;
     }
 
-    private static Boolean delete(final String path , final String method, final HttpExchange exchange) {
+    private static Boolean delete(final String method, final HttpExchange exchange) {
 
         if (method.equals(DELETE)) {
             try {
@@ -118,7 +118,7 @@ public class MainController {
                 exchange.close();
                 return didDelete;
             } catch(IOException e) {
-                sendErrorResponse(exchange, 400, "Error deleting user");
+                sendErrorResponse(exchange, 500, "Error deleting user");
 
             }
         }
