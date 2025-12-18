@@ -15,7 +15,7 @@ import java.util.Base64;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-//decryption needed, as instead I would neeed to iterate through all documents and hash that mail and compare against the hashed tokenmail
+//decryption needed, as instead I would need to iterate through all documents and hash that mail and compare against the hashed tokenmail
 public class TokenEncrypter {
 
     public static final Logger logger = Logger.getLogger(TokenEncrypter.class.getName());

@@ -39,7 +39,6 @@ public class LoginService {
             this.userCollection = userDB.getUserCollection(USER_COLLECTION_NAME);
     }
 
-
     public TokenData checkLoginData(final String mail, final String password) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         logger.log(Level.INFO, "in checkLoginData");
         Document foundDocument = userCollection.find(Filters.eq("mail", mail)).first();
@@ -58,7 +57,7 @@ public class LoginService {
                         final Instant timestamp = Instant.now();
                         final String userMail = optDbMail.get();
 
-                        return new TokenData(loadedUsername, services.TokenEncrypter.encrypt(userMail), timestamp.toString());
+                        return new TokenData(loadedUsername, services.TokenEncrypter.encrypt(userMail), services.TokenEncrypter.encrypt(timestamp.toString()));
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error while encrypting username and password", e);
                         return null;
