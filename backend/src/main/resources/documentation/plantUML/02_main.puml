@@ -1,0 +1,26 @@
+@startuml
+title Main – Serverstart & CORS
+
+class Main {
+  {static} logger : Logger
+  {static} PORT : int = 8080
+  + main(args : String[]) : void
+}
+
+class HttpServer <<external>>
+class InetSocketAddress <<external>>
+
+Main ..> HttpServer : create(...), start(...)
+Main ..> InetSocketAddress
+Main ..> controllers.MainController : processRequest(...)
+Main ..> services.Util : sendErrorResponse(...)
+
+note right of Main
+CORS-Header (global):
+- Access-Control-Allow-Origin: *
+- Allow-Methods: GET,POST,PUT,DELETE,OPTIONS
+- Allow-Headers: Content-Type, Authorization
+- Max-Age: 3600
+Behandelt OPTIONS-Preflight mit 204.
+end note
+@enduml

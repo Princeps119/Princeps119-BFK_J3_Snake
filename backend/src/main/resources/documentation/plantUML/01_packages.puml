@@ -1,0 +1,82 @@
+@startuml
+title BFK_J3_Snake – Backend (Gesamtübersicht)
+
+package "root" {
+  class Main
+}
+
+package "controllers" {
+  class MainController
+}
+
+package "services" {
+  class LoginService <<singleton>>
+  class RegistrationService <<singleton>>
+  class Util
+  class TokenEncrypter
+  class DeletionService <<stub>>
+}
+
+package "repository" {
+  class MongoRepo <<singleton>>
+}
+
+package "data" {
+  class LoginData <<record>>
+  class RegisterData <<record>>
+  class TokenData <<record>>
+}
+
+package "exceptions" {
+  class UserNotFoundException <<stub>>
+}
+
+package "external" {
+  class HttpServer <<external>>
+  class HttpExchange <<external>>
+  class Gson <<external>>
+  class JsonReader <<external>>
+  class MongoCollection <<external>>
+  class MongoDatabase <<external>>
+  class Document <<external>>
+  class Filters <<external>>
+  class Logger <<external>>
+}
+
+/* Beziehungen */
+Main ..> controllers.MainController : processRequest(...)
+Main ..> services.Util : sendErrorResponse(...)
+
+controllers.MainController ..> services.LoginService
+controllers.MainController ..> services.RegistrationService
+controllers.MainController ..> services.DeletionService
+controllers.MainController ..> data.LoginData
+controllers.MainController ..> data.RegisterData
+controllers.MainController ..> data.TokenData
+controllers.MainController ..> Gson
+controllers.MainController ..> JsonReader
+controllers.MainController ..> HttpExchange
+
+services.LoginService ..> repository.MongoRepo
+services.LoginService o--> MongoCollection
+services.LoginService ..> Document
+services.LoginService ..> Filters
+services.LoginService ..> services.Util
+services.LoginService ..> services.TokenEncrypter
+services.LoginService ..> data.TokenData
+services.LoginService ..> exceptions.UserNotFoundException
+
+services.RegistrationService ..> repository.MongoRepo
+services.RegistrationService o--> MongoCollection
+services.RegistrationService ..> Document
+services.RegistrationService ..> Filters
+services.RegistrationService ..> services.Util
+services.RegistrationService ..> data.RegisterData
+
+services.Util ..> HttpExchange
+services.TokenEncrypter ..> Key <<external>>
+
+repository.MongoRepo ..> MongoDatabase
+repository.MongoRepo ..> MongoCollection
+repository.MongoRepo ..> Document
+@enduml
