@@ -1,4 +1,4 @@
-function buttoncklicked(id) {
+async function buttoncklicked(id) {
   let button = document.getElementById(id);
   console.log(button.value);
   let schluessel = document.getElementById("user_pw");
@@ -19,24 +19,29 @@ function buttoncklicked(id) {
     error_cleaner(2);
   }
 
-  /*fetch("https://serververbindung"),{
+  //login anbindung max
+  try {
+    const response = await fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mail: button.value,
+        password: schluessel.value,
+      }),
+    });
 
-        method: "POST",
-        body: JSON.stringify({
-            user_name: button.value,
-            user_key: schluessel.value,
-        }),
-        headers: {
-        "Content-type": "application/json; charset=UTF-8"
-        }
-    }*/
+    console.log("Response status:", response);
 
-  console.log(
-    JSON.stringify({
-      user_mail: button.value,
-      user_pw: schluessel.value,
-    })
-  );
+    if (response.ok) {
+      setTimeout(() => (window.location.href = "/frontend/snake.html"), 2000);
+    } else {
+      alert("Fehler: Anmeldung fehlgeschlagen");
+    }
+  } catch (error) {
+    alert("Fehler beim Verbinden mit dem Server: " + error.message);
+  }
 }
 //errorr sachen ab hir einmal anschallten
 function error(error_code) {
