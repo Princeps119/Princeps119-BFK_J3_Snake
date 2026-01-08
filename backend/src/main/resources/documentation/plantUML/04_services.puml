@@ -1,15 +1,15 @@
 
 @startuml
 title Services – Login, Registrierung, Utilities, Token
-
+left to right direction
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 
+' External stubs
 class HttpExchange <<external>>
 class Key <<external>>
 class MongoCollection <<external>>
 class Document <<external>>
-class Filters <<external>>
 class Logger <<external>>
 
 package "services" {
@@ -50,7 +50,6 @@ package "services" {
 LoginService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
 LoginService o--> MongoCollection : userCollection
 LoginService ..> Document
-LoginService ..> Filters : eq(...)
 LoginService ..> services.Util : hashPassword(...)
 LoginService ..> services.TokenEncrypter : encrypt(...)
 LoginService ..> data.TokenData : returns
@@ -59,7 +58,6 @@ LoginService ..> exceptions.UserNotFoundException : throws
 RegistrationService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
 RegistrationService o--> MongoCollection : userCollection
 RegistrationService ..> Document : insertOne(...)
-RegistrationService ..> Filters : eq(...)
 RegistrationService ..> services.Util : hashPassword(...)
 RegistrationService ..> data.RegisterData : uses
 
