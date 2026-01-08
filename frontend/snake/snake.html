@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="snake.css">
+    <title>🐍 Snake</title>
+</head>
+
+<body>
+    <!-- Dialog wird später über JS gesteuert. -->
+    <!-- End Game Message Dialog und Spielinformation  -->
+    <div class="dialog-container" id="dialog-root"></div>
+
+    <div class="main-container">
+        <div class="header">
+            <h1>Snake Spiel 🐍</h1>
+                <!-- <button onclick=showInformationDialog()>Open InformationDialog</button>
+                <button onclick=showEndScreen()>Open Endscreen</button> -->
+                <span>Hallo <span id="username">Spieler</span></span>
+        </div>
+
+        <div class="game-container">
+            <div class="score-board">
+                <p>Score: <span id="score">0</span></p>
+                <p>Highscore: <span id="highscore">0</span></p>
+            </div>
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Section wird später dann über JS gesteuert. -->
+        <div class="section" id="progress-section"></div>
+
+        <!-- Idee: UIState welche nur UI Elemente steuert, z.B. Dialoge, Progress Section, Schlange, SpielUI etc. -->
+        <!-- AuthState steuert den User Login Status. -->
+        <!-- GameState steuert die Logik des Spiels -->
+        <!-- State Klasse führt Logik und UI zusammen -->
+        <!-- Alle Klassen und States werden dann in der snake.js welche als main.js dient zusammengefasst. Und das StartGame beinhaltet.-->
+        <script src="/frontend/snake/js/snake.js"></script>
+</body>
+
+</html>
