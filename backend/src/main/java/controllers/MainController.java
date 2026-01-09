@@ -99,12 +99,20 @@ public class MainController {
             if (method.equals(POST)) {
                 final TokenData loginToken = readJSON(exchange, TokenData.class);
                 final LoginService loginService = LoginService.getInstance();
-                return loginService.logout(loginToken);
+                final boolean result = loginService.logout(loginToken);
+                if (result) {
+                    exchange.sendResponseHeaders(200, -1);
+                    exchange.close();
+                    return true;
+                } else  {
+                    sendErrorResponse(exchange, 500, "Error processing logout request");
+                }
             }
-        } catch (EncryptionException e) {
+        } catch (EncryptionException | IOException e) {
             logger.log(Level.WARNING, "Error processing logout request", e);
             sendErrorResponse(exchange, 500, "Error processing logout request");
         }
+
         return false;
     }
 
