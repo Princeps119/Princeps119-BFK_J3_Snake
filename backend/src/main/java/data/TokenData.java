@@ -1,6 +1,5 @@
 package data;
 
-import java.util.UUID;
 /**
  * Represents the current state of the snake in the game.
  *
@@ -10,5 +9,5 @@ import java.util.UUID;
  * @param version UUID used on logout the users saved version attribute of the token in mongoDB is changed -> all requests where the request uuid is not the
  *                same as the one saved in MongoDB are declined. (This enables logout via the token and prevents an old saved token to be used)
  */
-public record TokenData(String username, String encryptedMail, String timestamp, UUID version) {
+public record TokenData(String username, String encryptedMail, String timestamp, String version) {
 }

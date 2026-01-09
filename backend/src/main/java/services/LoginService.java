@@ -50,7 +50,7 @@ public class LoginService {
     public boolean logout(final TokenData loginToken) throws EncryptionException {
         try {
             //create a token with new UUID and timestamp with a value which will lead to a decline if used, to update the user needs to log in again
-            TokenData newToken = new TokenData(loginToken.username(), loginToken.encryptedMail(), Instant.now().minus(4, ChronoUnit.HOURS).toString(), UUID.randomUUID());
+            TokenData newToken = new TokenData(loginToken.username(), loginToken.encryptedMail(), Instant.now().minus(4, ChronoUnit.HOURS).toString(), UUID.randomUUID().toString());
 
             userCollection.updateOne(
                     Filters.eq("mail", TokenEncrypter.decrypt(loginToken.encryptedMail())),
@@ -81,7 +81,7 @@ public class LoginService {
                         final Instant timestamp = Instant.now();
                         final String userMail = optDbMail.get();
 
-                        final TokenData token = new TokenData(loadedUsername, TokenEncrypter.encrypt(userMail), TokenEncrypter.encrypt(timestamp.toString()), UUID.randomUUID());
+                        final TokenData token = new TokenData(loadedUsername, TokenEncrypter.encrypt(userMail), TokenEncrypter.encrypt(timestamp.toString()), UUID.randomUUID().toString());
 
                         userCollection.updateOne(Filters.eq("mail", mail), Updates.set("LoginToken", token));
 

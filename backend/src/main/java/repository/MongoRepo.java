@@ -90,7 +90,7 @@ public class MongoRepo {
             String password = "mySecretPassword";
 
 
-            TokenData tokenData = new TokenData(username, TokenEncrypter.encrypt(email), Instant.now().toString(), UUID.randomUUID());
+            TokenData tokenData = new TokenData(username, TokenEncrypter.encrypt(email), Instant.now().toString(), UUID.randomUUID().toString());
             MongoCollection<Document> users = userDB.getCollection("users");
 
             // Hash password (SHA-256)

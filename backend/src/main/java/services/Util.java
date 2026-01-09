@@ -139,7 +139,7 @@ public class Util {
 
         // check timestamp and UUID
         try {
-            final UUID version = tokenData.version();
+            final UUID version = UUID.fromString(tokenData.version());
 
             Optional<Document> userDocument = Optional.ofNullable(userCollection.find(Filters.eq("mail", decryptedMail)).first());
             if (userDocument.isPresent()) {
