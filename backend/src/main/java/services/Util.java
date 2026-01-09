@@ -4,8 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.sun.net.httpserver.HttpExchange;
 import data.TokenData;
+import exceptions.UserNotFoundException;
+import org.bson.Document;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,6 +22,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,7 +100,7 @@ public class Util {
         }
     }
 
-    public static String checkLoginToken(HttpExchange exchange) {
+    public static String checkLoginToken(HttpExchange exchange, MongoCollection<Document> userCollection) {
         //check timestamp and LoginToken, if null is returned an error happened
         final String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -128,15 +134,30 @@ public class Util {
             return null;
         }
 
-        // check timestamp
+        // check timestamp and UUID
         try {
-            Instant tokenTime = Instant.parse(decryptedTimestamp);
-            if (Duration.between(tokenTime, Instant.now()).toHours() > 4) {
-                sendErrorResponse(exchange, 401, "Token expired");
-                return null;
+            final UUID version = tokenData.version();
+
+            Optional<Document> userDocument = Optional.ofNullable(userCollection.find(Filters.eq("mail", decryptedMail)).first());
+            if (userDocument.isPresent()) {
+                Document loginToken = userDocument.get().get("LoginToken", Document.class);
+                if (loginToken != null) {
+                    final UUID savedVersion = UUID.fromString(loginToken.getString("version")); // default 0 if missing
+                    if (savedVersion.equals(version)) {
+                        Instant tokenTime = Instant.parse(decryptedTimestamp);
+                        if (Duration.between(tokenTime, Instant.now()).toHours() > 4) {
+                            sendErrorResponse(exchange, 401, "Token expired");
+                            return null;
+                        }
+                    } else {
+                        sendErrorResponse(exchange, 401, "wrong UUID");
+                    }
+                }
+            } else  {
+                throw new UserNotFoundException("User not found");
             }
         } catch (Exception e) {
-            sendErrorResponse(exchange, 400, "Invalid timestamp format");
+            sendErrorResponse(exchange, 400, "Invalid timestamp or LoginToken format");
             return null;
         }
 

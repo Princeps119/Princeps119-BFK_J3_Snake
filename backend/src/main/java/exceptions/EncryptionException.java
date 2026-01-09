@@ -1,9 +1,10 @@
 package exceptions;
 
-public class UserNotFoundException extends RuntimeException {
+public class EncryptionException extends RuntimeException {
+
     final String message;
 
-    public UserNotFoundException(String message) {
+    public EncryptionException(String message) {
         this.message = message;
     }
 
@@ -11,4 +12,7 @@ public class UserNotFoundException extends RuntimeException {
     public String getMessage() {
         return "User not found";
     }
+
 }
+
+

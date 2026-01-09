@@ -9,6 +9,7 @@ import data.LoginData;
 import data.RegisterData;
 import data.SnakePositionData;
 import data.TokenData;
+import exceptions.EncryptionException;
 import exceptions.UserNotFoundException;
 import services.DeletionService;
 import services.LoginService;
@@ -40,7 +41,7 @@ public class MainController {
 
     public static final Logger logger = Logger.getLogger(MainController.class.getName());
 
-    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register", "/api/delete", "/api/load"));
+    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register", "/api/delete", "/api/load", "/api/logout"));
 
     public static final String POST = "POST";
     public static final String GET = "GET";
@@ -88,10 +89,26 @@ public class MainController {
                     return delete(method, exchange);
                 case 5:
                     return load(method, exchange);
+                case 6:
+                    return logout(method, exchange);
 
             }
         }
         throw new IllegalArgumentException("Invalid path");
+    }
+
+    private static boolean logout(String method, HttpExchange exchange) {
+        try {
+            if (method.equals(POST)) {
+                final TokenData loginToken = readJSON(exchange, TokenData.class);
+                final LoginService loginService = LoginService.getInstance();
+                return loginService.logout(loginToken);
+            }
+        } catch (EncryptionException e) {
+            logger.log(Level.WARNING, "Error processing logout request", e);
+            sendErrorResponse(exchange, 500, "Error processing logout request");
+        }
+        return false;
     }
 
     private static String checkPath(final String path, final HttpExchange exchange) {
@@ -268,34 +285,34 @@ public class MainController {
 
     //needs the LoginToken in a Header
     private static Boolean load(final String method, final HttpExchange exchange) {
-       if (method.equals(GET)) {
-           try {
-               final SaveGameService saveService = SaveGameService.getInstance();
+        if (method.equals(GET)) {
+            try {
+                final SaveGameService saveService = SaveGameService.getInstance();
 
-               final SnakePositionData snakeData = saveService.loadGame(exchange);
+                final SnakePositionData snakeData = saveService.loadGame(exchange);
 
-               final Gson gson = new GsonBuilder().create();
-               final String json = gson.toJson(snakeData);
-               byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+                final Gson gson = new GsonBuilder().create();
+                final String json = gson.toJson(snakeData);
+                byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
 
-               exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
-               exchange.sendResponseHeaders(200, bytes.length);
+                exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+                exchange.sendResponseHeaders(200, bytes.length);
 
-               try (OutputStream os = exchange.getResponseBody()) {
-                   os.write(bytes);
-               }
-               return true;
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(bytes);
+                }
+                return true;
 
-           } catch (UserNotFoundException e) {
-               sendErrorResponse(exchange, 500, "User not found");
-           } catch (IllegalArgumentException e) {
-               sendErrorResponse(exchange, 400, "Invalid username or password");
-           } catch (IOException e) {
-               sendErrorResponse(exchange, 500, "Internal server error");
-           }
-           return false;
-       }
-       return false;
+            } catch (UserNotFoundException e) {
+                sendErrorResponse(exchange, 500, "User not found");
+            } catch (IllegalArgumentException e) {
+                sendErrorResponse(exchange, 400, "Invalid username or password");
+            } catch (IOException e) {
+                sendErrorResponse(exchange, 500, "Internal server error");
+            }
+            return false;
+        }
+        return false;
     }
 
     private static Boolean checkBackend(final String method, final HttpExchange exchange) throws IllegalArgumentException {

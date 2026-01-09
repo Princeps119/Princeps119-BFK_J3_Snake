@@ -33,7 +33,7 @@ public class SaveGameService {
 
     public SnakePositionData loadGame(final HttpExchange exchange) {
 
-        final String decryptedMail = Util.checkLoginToken(exchange);
+        final String decryptedMail = Util.checkLoginToken(exchange, userCollection);
 
         if (decryptedMail == null) {
             throw new IllegalArgumentException("Invalid login token");
@@ -56,7 +56,7 @@ public class SaveGameService {
 
     public boolean saveSnakePosition(HttpExchange exchange, SnakePositionData snakeData) {
 
-        final String decryptedMail = Util.checkLoginToken(exchange);
+        final String decryptedMail = Util.checkLoginToken(exchange, userCollection);
 
         if (decryptedMail == null) {
             return false;

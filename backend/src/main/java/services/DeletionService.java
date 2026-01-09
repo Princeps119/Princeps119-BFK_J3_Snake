@@ -32,7 +32,7 @@ public class DeletionService {
 
     public boolean deleteUser (final HttpExchange exchange) {
 
-        final String decryptedMail = Util.checkLoginToken(exchange);
+        final String decryptedMail = Util.checkLoginToken(exchange, userCollection);
 
         if (decryptedMail == null) {
             return false;
