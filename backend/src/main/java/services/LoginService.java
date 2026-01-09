@@ -3,6 +3,8 @@ package services;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.sun.net.httpserver.HttpExchange;
+import data.LoginData;
 import data.TokenData;
 import exceptions.EncryptionException;
 import exceptions.UserNotFoundException;
@@ -22,6 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static services.Util.hashPassword;
+import static services.Util.readJSON;
+import static services.Util.sendErrorResponse;
 
 public class LoginService {
 
@@ -91,5 +95,29 @@ public class LoginService {
         }
         logger.log(Level.WARNING, "user not found");
         throw new UserNotFoundException("no document found");
+    }
+
+    public LoginData getMailAndPassword(HttpExchange exchange) throws EncryptionException {
+        // Parse and validate JSON
+        final LoginData loginData = readJSON(exchange, LoginData.class);
+
+        // Validate required fields
+        if (loginData == null) {
+            sendErrorResponse(exchange, 400, "Invalid JSON: cannot parse login data");
+        }
+
+        final String mail = loginData.mail();
+        final String password = loginData.password();
+
+        if (mail == null || mail.trim().isEmpty()) {
+            sendErrorResponse(exchange, 400, "Email is required");
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            sendErrorResponse(exchange, 400, "Password is required");
+        }
+
+        logger.log(Level.INFO, "Processing login for: {0}", mail);
+        return loginData;
     }
 }

@@ -11,7 +11,9 @@ import data.TokenData;
 import exceptions.UserNotFoundException;
 import org.bson.Document;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static controllers.MainController.CONTENT_TYPE_JSON;
 import static controllers.MainController.POST;
@@ -162,5 +165,38 @@ public class Util {
         }
 
         return decryptedMail;
+    }
+
+    public static <T> T readJSON(final HttpExchange exchange, Class<T> clazz) {
+        final JsonReader reader = createJsonReader(exchange);
+        final Gson gson = new GsonBuilder().create();
+        return gson.fromJson(reader, clazz);
+    }
+
+    public static String checkPath(final String path, final HttpExchange exchange) {
+
+        long slashCount = path.chars().filter(ch -> ch == '/').count();
+
+        if (slashCount == 3) {
+            // Remove everything from the last slash onwards
+            int lastSlash = path.lastIndexOf('/');
+            return path.substring(0, lastSlash);
+        } else if (slashCount == 2) {
+            return path;
+        } else {
+            sendErrorResponse(exchange, 400, "Invalid JSON format");
+        }
+        sendErrorResponse(exchange, 400, "Invalid JSON format");
+        return path;
+    }
+
+    public static JsonReader createJsonReader(HttpExchange exchange) {
+        final String body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
+                .lines()
+                .collect(Collectors.joining("\n"));
+
+        logger.log(Level.INFO, "got RequestBody: {0}", body);
+
+        return new JsonReader(new StringReader(body));
     }
 }

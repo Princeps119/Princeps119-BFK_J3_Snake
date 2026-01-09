@@ -3,7 +3,6 @@ package controllers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
 import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
 import data.RegisterData;
@@ -19,11 +18,8 @@ import services.SaveGameService;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,8 +28,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
+import static services.Util.checkPath;
+import static services.Util.readJSON;
 import static services.Util.sendErrorResponse;
 import static services.Util.validateInputs;
 
@@ -111,23 +108,6 @@ public class MainController {
         return false;
     }
 
-    private static String checkPath(final String path, final HttpExchange exchange) {
-
-        long slashCount = path.chars().filter(ch -> ch == '/').count();
-
-        if (slashCount == 3) {
-            // Remove everything from the last slash onwards
-            int lastSlash = path.lastIndexOf('/');
-            return path.substring(0, lastSlash);
-        } else if (slashCount == 2) {
-            return path;
-        } else {
-            sendErrorResponse(exchange, 400, "Invalid JSON format");
-        }
-        sendErrorResponse(exchange, 400, "Invalid JSON format");
-        return path;
-    }
-
     private static Boolean delete(final String method, final HttpExchange exchange) {
 
         if (method.equals(DELETE)) {
@@ -178,16 +158,6 @@ public class MainController {
         return false;
     }
 
-    public static JsonReader createJsonReader(HttpExchange exchange) {
-        final String body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))
-                .lines()
-                .collect(Collectors.joining("\n"));
-
-        logger.log(Level.INFO, "got RequestBody: {0}", body);
-
-        return new JsonReader(new StringReader(body));
-    }
-
     private static boolean login(final String method, final HttpExchange exchange) {
 
         if (!validateInputs(method, exchange)) {
@@ -195,36 +165,15 @@ public class MainController {
         }
 
         try {
-            // Parse and validate JSON
-            final LoginData loginData = readJSON(exchange, LoginData.class);
-
-            // Validate required fields
-            if (loginData == null) {
-                sendErrorResponse(exchange, 400, "Invalid JSON: cannot parse login data");
-                return false;
-            }
-
-            final String mail = loginData.mail();
-            final String password = loginData.password();
-
-            if (mail == null || mail.trim().isEmpty()) {
-                sendErrorResponse(exchange, 400, "Email is required");
-                return false;
-            }
-
-            if (password == null || password.trim().isEmpty()) {
-                sendErrorResponse(exchange, 400, "Password is required");
-                return false;
-            }
-
-            logger.log(Level.INFO, "Processing login for: {0}", mail);
 
             // Authenticate user
             final LoginService loginService = LoginService.getInstance();
             TokenData token;
 
+            final LoginData loginData = loginService.getMailAndPassword(exchange);
+
             try {
-                token = loginService.checkLoginData(mail, password);
+                token = loginService.checkLoginData(loginData.mail(), loginData.password());
             } catch (NoSuchPaddingException | IllegalBlockSizeException |
                      NoSuchAlgorithmException | BadPaddingException |
                      InvalidKeyException e) {
@@ -330,11 +279,5 @@ public class MainController {
             throw new IllegalArgumentException("Invalid method");
         }
         return false;
-    }
-
-    private static <T> T readJSON(final HttpExchange exchange, Class<T> clazz) {
-        final JsonReader reader = createJsonReader(exchange);
-        final Gson gson = new GsonBuilder().create();
-        return gson.fromJson(reader, clazz);
     }
 }
