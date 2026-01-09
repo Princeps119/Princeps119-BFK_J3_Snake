@@ -35,7 +35,7 @@ async function buttoncklicked(id) {
     console.log("Response status:", response);
 
     if (response.ok) {
-      setTimeout(() => (window.location.href = "/frontend/snake.html"), 2000);
+      setTimeout(() => (window.location.href = "/frontend/snake/snake.html"), 2000);
     } else {
       alert("Fehler: Anmeldung fehlgeschlagen");
     }
