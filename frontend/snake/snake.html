@@ -5,39 +5,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="snake.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <title>🐍 Snake</title>
 </head>
 
-<body>
+<body onload="init()">
+    <!-- <body> -->
     <!-- Dialog wird später über JS gesteuert. -->
     <!-- End Game Message Dialog und Spielinformation  -->
     <div class="dialog-container" id="dialog-root"></div>
 
+    <div id="settings-dialog">
+        <h2>Einstellungen</h2>
+
+        <label for="speed">Geschwindigkeit</label>
+        <select id="speed">
+            <option value="20">Langsam</option>
+            <option value="30" selected>Mittel</option>
+            <option value="40">Schnell</option>
+            <option value="40">Extrem</option>
+        </select>
+
+        <label for="gridSize">Spielfeldgröße</label>
+        <select id="gridSize">
+            <option value="20">20 × 20</option>
+            <option value="30" selected>30 × 30</option>
+            <option value="40">40 × 40</option>
+        </select>
+
+        <!-- USER ACTIONS (wenn eingeloggt) -->
+        <div id="user-actions">
+            <!-- FUnktion aufrufen zum Logout -->
+            <button id="logoutBtn" class="secondary" onclick="logout()">
+                Logout
+            </button>
+
+            <!-- Funktion aufrufen zum löschen des users mit alert ob dieser wirklich gelöscht werden soll. -->
+            <button id="deleteUserBtn" class="danger" onclick="deleteUser()">
+                Benutzer löschen
+            </button>
+        </div>
+
+        <!-- LOGIN (wenn kein User existiert) -->
+        <div id="login-dialog">
+            Noch keinen Account?
+           <a href="/frontend/login/Login.html">Anmelden</a>
+        </div>
+
+        <span>
+            Bei Änderung der Werte wird das laufende Spiel automatisch neu gestartet.
+        </span>
+
+        <button id="saveSettings">Speichern & Schließen</button>
+    </div>
+
+
     <div class="main-container">
+        <button class="settings-btn" id="openSettings">
+            <i class="fa-solid fa-gear"></i>
+        </button>
         <div class="header">
             <h1>Snake Spiel 🐍</h1>
-                <!-- <button onclick=showInformationDialog()>Open InformationDialog</button>
-                <button onclick=showEndScreen()>Open Endscreen</button> -->
-                <span>Hallo <span id="username">Spieler</span></span>
+            <!-- <button onclick=showInformationDialog()>Open InformationDialog</button>
+            <button onclick=showEndScreen()>Open Endscreen</button> -->
+            <span>Hallo <span id="username">Spieler</span></span>
         </div>
 
         <div class="game-container">
             <div class="score-board">
-                <p>Score: <span id="score">0</span></p>
+                <p>Score: <span id="Score">0</span></p>
                 <p>Highscore: <span id="highscore">0</span></p>
             </div>
-            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <canvas id="x" width="500" height="500" style="background: rgb(1, 73, 1); border:5px solid #000000;">Snake
+                game läd nicht</canvas>
         </div>
 
         <!-- Section wird später dann über JS gesteuert. -->
         <div class="section" id="progress-section"></div>
 
-        <!-- Idee: UIState welche nur UI Elemente steuert, z.B. Dialoge, Progress Section, Schlange, SpielUI etc. -->
-        <!-- AuthState steuert den User Login Status. -->
-        <!-- GameState steuert die Logik des Spiels -->
-        <!-- State Klasse führt Logik und UI zusammen -->
-        <!-- Alle Klassen und States werden dann in der snake.js welche als main.js dient zusammengefasst. Und das StartGame beinhaltet.-->
-        <script src="/frontend/snake/js/snake.js"></script>
+        <script src="/frontend/snake/snake.js"></script>
+        <script src="/frontend/snake/eventlisener.js"></script>
+        <script src="/frontend/snake/main.js"></script>
 </body>
 
 </html>
