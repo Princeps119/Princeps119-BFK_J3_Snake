@@ -123,6 +123,7 @@ public class Util {
             tokenData = gson.fromJson(reader, tokenType);
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception", e);
             sendErrorResponse(exchange, 400, "Malformed token");
             return null;
         }
@@ -133,6 +134,7 @@ public class Util {
             decryptedMail = TokenEncrypter.decrypt(tokenData.encryptedMail());
             decryptedTimestamp = TokenEncrypter.decrypt(tokenData.timestamp());
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception", e);
             sendErrorResponse(exchange, 400, "Invalid token encryption");
             return null;
         }
@@ -160,6 +162,7 @@ public class Util {
                 throw new UserNotFoundException("User not found");
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception", e);
             sendErrorResponse(exchange, 400, "Invalid timestamp or LoginToken format");
             return null;
         }
