@@ -107,12 +107,14 @@ public class Util {
         //check timestamp and LoginToken, if null is returned an error happened
         final String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.log(Level.WARNING, "Missing or invalid Authorization header");
             sendErrorResponse(exchange, 401, "Missing or invalid Authorization header");
             return null;
         }
 
         final String tokenJson = authHeader.substring("Bearer ".length()).trim();
-
+        logger.log(Level.INFO, "Checking login token: {0}", tokenJson);
+        
         TokenData tokenData;
         try {
             final JsonReader reader = new JsonReader(new StringReader(tokenJson));
