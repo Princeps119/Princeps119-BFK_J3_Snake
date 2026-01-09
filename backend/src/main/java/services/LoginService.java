@@ -52,7 +52,6 @@ public class LoginService {
                     Optional<String> optUsername = Optional.ofNullable(foundDocument.get("username").toString());
 
                     try {
-                        // todo create token with uid and mail and timestamp to be saved in different collection
                         final String loadedUsername = optUsername.orElse(null);
                         final Instant timestamp = Instant.now();
                         final String userMail = optDbMail.get();

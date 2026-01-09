@@ -1,12 +1,21 @@
 package services;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.sun.net.httpserver.HttpExchange;
+import data.TokenData;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
@@ -83,5 +92,54 @@ public class Util {
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to send error response", e);
         }
+    }
+
+    public static String checkLoginToken(HttpExchange exchange) {
+        //check timestamp and LoginToken, if null is returned an error happened
+        final String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            sendErrorResponse(exchange, 401, "Missing or invalid Authorization header");
+            return null;
+        }
+
+        final String tokenJson = authHeader.substring("Bearer ".length()).trim();
+
+        TokenData tokenData;
+        try {
+            final JsonReader reader = new JsonReader(new StringReader(tokenJson));
+            final Gson gson = new GsonBuilder().create();
+            final Type tokenType = new TypeToken<TokenData>() {
+            }.getType();
+
+            tokenData = gson.fromJson(reader, tokenType);
+
+        } catch (Exception e) {
+            sendErrorResponse(exchange, 400, "Malformed token");
+            return null;
+        }
+
+        String decryptedMail;
+        String decryptedTimestamp;
+        try {
+            decryptedMail = TokenEncrypter.decrypt(tokenData.encryptedMail());
+            decryptedTimestamp = TokenEncrypter.decrypt(tokenData.timestamp());
+        } catch (Exception e) {
+            sendErrorResponse(exchange, 400, "Invalid token encryption");
+            return null;
+        }
+
+        // check timestamp
+        try {
+            Instant tokenTime = Instant.parse(decryptedTimestamp);
+            if (Duration.between(tokenTime, Instant.now()).toHours() > 4) {
+                sendErrorResponse(exchange, 401, "Token expired");
+                return null;
+            }
+        } catch (Exception e) {
+            sendErrorResponse(exchange, 400, "Invalid timestamp format");
+            return null;
+        }
+
+        return decryptedMail;
     }
 }

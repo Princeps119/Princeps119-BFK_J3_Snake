@@ -7,10 +7,13 @@ import com.google.gson.stream.JsonReader;
 import com.sun.net.httpserver.HttpExchange;
 import data.LoginData;
 import data.RegisterData;
+import data.SnakePositionData;
 import data.TokenData;
+import exceptions.UserNotFoundException;
 import services.DeletionService;
 import services.LoginService;
 import services.RegistrationService;
+import services.SaveGameService;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -37,11 +40,11 @@ public class MainController {
 
     public static final Logger logger = Logger.getLogger(MainController.class.getName());
 
-    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register", "/api/delete"));
+    private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend", "/api/register", "/api/delete", "/api/load"));
 
     public static final String POST = "POST";
     public static final String GET = "GET";
-    public static final String PUT = "PUT";
+    public static final String PATCH = "PATCH";
     public static final String DELETE = "DELETE";
 
     public static final String CONTENT_TYPE_JSON = "application/json";
@@ -83,6 +86,8 @@ public class MainController {
                     return register(method, exchange);
                 case 4:
                     return delete(method, exchange);
+                case 5:
+                    return load(method, exchange);
 
             }
         }
@@ -115,7 +120,7 @@ public class MainController {
                 exchange.sendResponseHeaders(204, -1);
                 exchange.close();
                 return didDelete;
-            } catch(IOException e) {
+            } catch (IOException e) {
                 sendErrorResponse(exchange, 500, "Error deleting user");
 
             }
@@ -130,11 +135,11 @@ public class MainController {
                     final RegisterData registerData = readJSON(exchange, RegisterData.class);
                     final RegistrationService registrationService = RegistrationService.getInstance();
 
-                     if (registrationService.register(registerData)) {
-                         exchange.sendResponseHeaders(204, -1);
-                         exchange.close();
-                         return true;
-                     }
+                    if (registrationService.register(registerData)) {
+                        exchange.sendResponseHeaders(204, -1);
+                        exchange.close();
+                        return true;
+                    }
 
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.WARNING, "illegal argument", e);
@@ -245,8 +250,52 @@ public class MainController {
     }
 
     private static Boolean save(final String method, HttpExchange exchange) {
+        if (method.equals(PATCH) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
+            if (exchange.getRequestBody() != null) {
+                try {
+                    final SaveGameService saveService = SaveGameService.getInstance();
+                    final SnakePositionData snakeData = readJSON(exchange, SnakePositionData.class);
+                    return saveService.saveSnakePosition(exchange, snakeData);
 
+                } catch (UserNotFoundException e) {
+                    sendErrorResponse(exchange, 400, "User not found");
+                }
+            }
+            return false;
+        }
         return false;
+    }
+
+    //needs the LoginToken in a Header
+    private static Boolean load(final String method, final HttpExchange exchange) {
+       if (method.equals(GET)) {
+           try {
+               final SaveGameService saveService = SaveGameService.getInstance();
+
+               final SnakePositionData snakeData = saveService.loadGame(exchange);
+
+               final Gson gson = new GsonBuilder().create();
+               final String json = gson.toJson(snakeData);
+               byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+
+               exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+               exchange.sendResponseHeaders(200, bytes.length);
+
+               try (OutputStream os = exchange.getResponseBody()) {
+                   os.write(bytes);
+               }
+               return true;
+
+           } catch (UserNotFoundException e) {
+               sendErrorResponse(exchange, 500, "User not found");
+           } catch (IllegalArgumentException e) {
+               sendErrorResponse(exchange, 400, "Invalid username or password");
+           } catch (IOException e) {
+               sendErrorResponse(exchange, 500, "Internal server error");
+           }
+           return false;
+       }
+       return false;
     }
 
     private static Boolean checkBackend(final String method, final HttpExchange exchange) throws IllegalArgumentException {
