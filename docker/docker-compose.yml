@@ -35,8 +35,8 @@ services:
     ports:
      - "27018:27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"] #Runs a JavaScript snippet in the Mongo shell. returns ok if the ping ist erfolgreich
+      interval: 30s
       timeout: 5s
       retries: 6
 

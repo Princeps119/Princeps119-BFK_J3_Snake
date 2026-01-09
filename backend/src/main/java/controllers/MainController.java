@@ -199,7 +199,7 @@ public class MainController {
                 os.write(responseBytes);
             }
 
-            logger.log(Level.INFO, "Login successful for: {0}", mail);
+            logger.log(Level.INFO, "Login successful for: {0}", loginData.mail());
             return true;
 
         } catch (JsonSyntaxException e) {

@@ -5,16 +5,24 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
+import data.TokenData;
 import org.bson.Document;
+import services.TokenEncrypter;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,6 +88,9 @@ public class MongoRepo {
             String username = "exampleUser";
             String email = "example@mail.com";
             String password = "mySecretPassword";
+
+
+            TokenData tokenData = new TokenData(username, TokenEncrypter.encrypt(email), Instant.now().toString(), UUID.randomUUID());
             MongoCollection<Document> users = userDB.getCollection("users");
 
             // Hash password (SHA-256)
@@ -90,12 +101,15 @@ public class MongoRepo {
             // Create document
             Document userDoc = new Document("username", username)
                     .append("mail", email)
-                    .append("hashedPassword", hashedPassword);
+                    .append("hashedPassword", hashedPassword)
+                    .append("LoginToken", tokenData);
 
             // Insert into collection
             users.insertOne(userDoc);
         } catch (NoSuchAlgorithmException e) {
             Logger.getLogger(MongoRepo.class.getName()).log(Level.SEVERE, "could not create example user", e);
+        } catch (NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            throw new RuntimeException(e);
         }
     }
 
