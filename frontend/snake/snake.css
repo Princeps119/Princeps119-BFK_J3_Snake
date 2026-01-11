@@ -1,11 +1,19 @@
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f5f5;
-  color: #333;
+  background: #000;
+  color: #eaeaea;
+  min-height: 100vh;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+}
+
+.main-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
   padding: 20px;
 }
 
@@ -13,122 +21,14 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  z-index: 10;
-  background-color: #ffffff;
+  background: #fff;
   border: none;
   border-radius: 50%;
   width: 45px;
   height: 45px;
   cursor: pointer;
-}
-
-/* #settings-dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 400px;
-  height: 400px;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  display: none;
-}
-#settings-dialog label,
-#settings-dialog input,
-#settings-dialog select {
-  display: block;
-  margin-bottom: 10px;
-} */
-
-.main-container {
-  position: relative;
-  width: 100%;
-}
-
-/* .dialog-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
-
-dialog {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 30px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 101;
-}
-
-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-dialog h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
-}
-
-dialog p {
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-dialog button {
-  background: #333;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 20px;
-}
-
-dialog button:hover {
-  background: #555;
-}
-
-.controls {
-  margin-bottom: 20px;
-}
-
-.controls h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.control-keys {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.control-keys span {
-  background: #f5f5f5;
-  padding: 8px;
-  border-radius: 4px;
-  border-left: 2px solid #333;
-}
-
-.main-container {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+  display: grid;
+  place-items: center;
 }
 
 .header {
@@ -136,56 +36,48 @@ dialog button:hover {
 }
 
 .header h1 {
-  font-size: 28px;
-  margin-bottom: 15px;
+  margin: 0 0 10px;
+  color: #fff;
 }
 
 .header span {
+  color: #bbb;
   font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.header button {
-  background: #333;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  position: relative;
-  z-index: 2;
-}
-
-.header button:hover {
-  background: #555;
 }
 
 .game-container {
   display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.game-and-info {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.game-column {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 30px;
 }
 
 .score-board {
   background: #fff;
-  padding: 20px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  margin-bottom: 20px;
+  color: #111;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
   width: 100%;
   max-width: 400px;
 }
 
 .score-board p {
+  margin: 0 0 8px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .score-board p:last-child {
@@ -193,137 +85,146 @@ dialog button:hover {
 }
 
 #gameCanvas {
-  display: block;
-  background: #000;
-  border: 2px solid #333;
-  border-radius: 4px;
+  border-radius: 8px;
   max-width: 100%;
-  height: auto;
 }
 
-.link-group {
+.info-column {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.info-box {
+  background: #fff;
+  color: #111;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.info-box h3 {
+  margin-top: 0;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+.controls h4 {
+  margin-bottom: 8px;
+}
+
+.control-keys {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
-.btn {
-  padding: 10px 20px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 600;
-  display: block;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-primary {
-  background: #333;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #555;
-}
-
-.btn-secondary {
+.control-keys span {
   background: #f5f5f5;
-  color: #333;
-  border: 1px solid #333;
-}
-
-.btn-secondary:hover {
-  background: #e8e8e8;
-}
-
-@media (max-width: 768px) {
-  .main-container {
-    padding: 15px;
-  }
-
-  .header h1 {
-    font-size: 24px;
-  }
-
-  #gameCanvas {
-    width: 100%;
-  }
+  padding: 8px;
+  border-radius: 6px;
+  border-left: 3px solid #333;
 }
 
 #settings-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
   width: 420px;
   max-width: 90%;
-  transform: translate(-50%, -50%);
-  background: #ffffff;
-  padding: 24px 28px;
+  background: #141414;
+  padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  z-index: 100;
   display: none;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  z-index: 100;
 }
 
 #settings-dialog h2 {
+  color: #fff;
   margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
 }
 
 #settings-dialog label {
   display: block;
+  color: #ddd;
   margin-bottom: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #555;
+  text-align: left;
 }
 
-#settings-dialog input,
 #settings-dialog select {
   width: 100%;
   padding: 12px;
-  margin-bottom: 16px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-#settings-dialog input:focus,
-#settings-dialog select:focus {
-  outline: none;
-  border-color: #014901;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  color: #fff;
 }
 
 #settings-dialog span {
   display: block;
-  margin: 12px 0 20px;
   font-size: 0.85rem;
-  color: #777;
-  background: #f5f7fa;
-  padding: 10px 12px;
+  color: #ccc;
+  background: #1e1e1e;
+  padding: 10px;
   border-radius: 8px;
+  margin: 12px 0;
+  text-align: left;
 }
 
 #saveSettings {
   width: 100%;
   padding: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
   background: #014901;
+  color: #fff;
   border: none;
   border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-#saveSettings:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+#user-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#user-actions button {
+  padding: 10px;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+#user-actions .deleteBtn {
+  background-color: #d40000;
+  border-color: rgba(255, 0, 0, 0.4);
+}
+
+#login-dialog {
+  text-align: left;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+#login-dialog a {
+  color: #9ad49a;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .game-and-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-column {
+    width: 100%;
+    max-width: 500px;
+  }
 }

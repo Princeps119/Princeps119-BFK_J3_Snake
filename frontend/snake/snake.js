@@ -15,7 +15,7 @@ let direction = "Right";
 let relodegame = setInterval(game, 500); //Spiel geschindigkeit
 let score = 0;
 function init() {
-  const canvas = document.getElementById("x");
+  const canvas = document.getElementById("gameCanvas");
   let canvash = canvas.attributes.height.value;
   let canvasw = canvas.attributes.width.value;
   //console.log(canvasw);
@@ -44,7 +44,7 @@ function init() {
   }
 }
 function relode() {
-  const canvas = document.getElementById("x");
+  const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -76,7 +76,7 @@ function move(direction) {
 }
 
 function snake_food(x, y, color) {
-  const canvas = document.getElementById("x");
+  const canvas = document.getElementById("gameCanvas");
   let canvash = canvas.attributes.height.value;
   let canvasw = canvas.attributes.width.value;
   const playgroundh = parseInt(canvash) / scale;
