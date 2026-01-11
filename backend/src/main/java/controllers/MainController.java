@@ -21,8 +21,6 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -38,17 +36,12 @@ public class MainController {
     public static final Logger logger = Logger.getLogger(MainController.class.getName());
 
     private static final ArrayList<String> mapping = new ArrayList<>(Arrays.asList("/api/login", "/api/save", "/api/checkBackend",
-            "/api/register", "/api/delete", "/api/load", "/api/logout",
-            // html pages
-
-            "/login", "/register", "/snake"));
+            "/api/register", "/api/delete", "/api/load", "/api/logout"));
 
     public static final String POST = "POST";
     public static final String GET = "GET";
     public static final String PATCH = "PATCH";
     public static final String DELETE = "DELETE";
-
-    public static final Path STATIC_ROOT = Path.of("/opt/exec/frontend");
 
     public static final String CONTENT_TYPE_JSON = "application/json";
 
@@ -62,9 +55,6 @@ public class MainController {
             logger.log(Level.INFO, "Request Method: {0}, Path: {1}",
                     new Object[]{method, path});
 
-            if (path.endsWith(".css") || path.endsWith(".js")) {
-                return Optional.of(serveAssetPages(path, exchange));
-            }
             return Optional.of(checkMapping(path, method, exchange));
 
         } catch (IllegalArgumentException | IOException e) {
@@ -72,26 +62,6 @@ public class MainController {
             logger.log(Level.WARNING, "Error processing request", e);
             throw new IllegalArgumentException("Error processing request", e);
         }
-    }
-
-    private static Boolean serveAssetPages(String path, HttpExchange exchange) throws IOException {
-
-        // Remove leading slash and resolve
-        String relativePath = path.startsWith("/") ? path.substring(1) : path;
-        Path file = STATIC_ROOT.resolve(relativePath).normalize();
-
-        if (!file.startsWith(STATIC_ROOT) || !Files.isRegularFile(file)) {
-            sendErrorResponse(exchange, 404, "Not Found: " + file);
-            return false;
-        }
-
-        byte[] body = Files.readAllBytes(file);
-        exchange.getResponseHeaders().set("Content-Type", guessContentType(file.toString()));
-        exchange.sendResponseHeaders(200, body.length);
-        try (var os = exchange.getResponseBody()) {
-            os.write(body);
-        }
-        return true;
     }
 
     private static Boolean checkMapping(final String path, final String method, final HttpExchange exchange) throws IllegalArgumentException, IOException {
@@ -116,33 +86,9 @@ public class MainController {
                     return load(method, exchange);
                 case 6:
                     return logout(method, exchange);
-                case 7, 8, 9:
-                    return serveHTMLPages(method, exchange, checkedPath);
             }
         }
         throw new IllegalArgumentException("Invalid path");
-    }
-
-    private static Boolean serveHTMLPages(final String method, final HttpExchange exchange, final String mappedPath) throws IOException {
-        if (!GET.equalsIgnoreCase(method)) {
-            sendErrorResponse(exchange, 405, "Method Not Allowed");
-            return false;
-        }
-
-        Path file = STATIC_ROOT.resolve(mappedPath.replace("/", "")).resolve(mappedPath.replace("/", "") + ".html").normalize();
-        if (!file.startsWith(STATIC_ROOT) || !Files.isRegularFile(file)) {
-            sendErrorResponse(exchange, 404, "Not Found: " + file);
-            return false;
-        }
-
-        byte[] responseBytes = Files.readAllBytes(file);
-        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
-        exchange.sendResponseHeaders(200, responseBytes.length);
-
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(responseBytes);
-        }
-        return true;
     }
 
     private static boolean logout(String method, HttpExchange exchange) {

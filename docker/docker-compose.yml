@@ -9,6 +9,7 @@ services:
     ports:
       - "8080:8080"
       - "5005:5005"       # <— expose debug port to host
+      - "3000:3000"       # <— expose port to serve html separate from the Server API Anfragen
 
     depends_on:
       mongoDB:

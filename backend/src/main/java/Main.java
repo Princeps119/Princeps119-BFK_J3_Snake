@@ -1,4 +1,5 @@
 import com.sun.net.httpserver.HttpServer;
+import controllers.FrontendController;
 import controllers.MainController;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class Main {
     public static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static final int PORT = 8080;
+    public static final int HTML_PORT = 3000;
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -48,5 +50,36 @@ public class Main {
         server.setExecutor(null);
         server.start();
         logger.info("Server running on port " + PORT);
+
+
+        final HttpServer staticServer = HttpServer.create(new InetSocketAddress(HTML_PORT), 0);
+
+        // Serve any file under /opt/exec/frontend at /
+        staticServer.createContext("/", exchange -> {
+            // Optional CORS for static too (helpful if static pages call API)
+            var headers = exchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin", "*");
+            headers.add("Access-Control-Allow-Methods", "GET,OPTIONS");
+            headers.add("Access-Control-Allow-Headers", "Content-Type");
+            headers.add("Access-Control-Max-Age", "3600");
+
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+                return;
+            }
+
+            try {
+                FrontendController.serveStaticFromRoot(exchange);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Static server error", e);
+                sendErrorResponse(exchange, 500, "Internal server error");
+            }
+        });
+
+        staticServer.setExecutor(null);
+        staticServer.start();
+        logger.info("Static site server running on port " + HTML_PORT);
+
     }
 }

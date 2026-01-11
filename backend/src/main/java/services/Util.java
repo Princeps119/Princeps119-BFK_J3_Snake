@@ -204,6 +204,7 @@ public class Util {
         if (p.endsWith(".html")) return "text/html; charset=utf-8";
         if (p.endsWith(".css")) return "text/css; charset=utf-8";
         if (p.endsWith(".js")) return "application/javascript; charset=utf-8";
+        if (p.endsWith(".webp")) return "image/webp";
         throw new RuntimeException("Content type not found for path: " + path);
     }
 
