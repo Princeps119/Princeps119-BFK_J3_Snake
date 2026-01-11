@@ -34,8 +34,6 @@ form.addEventListener("submit", async (e) => {
     isValid = false;
   }
 
-  console.log("Validation result:", isValid);
-
   if (isValid) {
     try {
       const response = await fetch("http://localhost:8080/api/register", {
@@ -50,12 +48,10 @@ form.addEventListener("submit", async (e) => {
         }),
       });
 
-      console.log("Response status:", response);
-
       if (response.ok) {
         successMsg.style.display = "block";
         form.reset();
-        setTimeout(() => (window.location.href = "/frontend/login/login.html"), 2000);
+        setTimeout(() => (window.location.href = "/frontend/login/login.html"), 1000);
       } else {
         alert("Fehler: Registrierung fehlgeschlagen");
       }

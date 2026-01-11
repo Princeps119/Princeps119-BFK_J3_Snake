@@ -6,7 +6,7 @@
 }
 
 body {
-    background: #ffffff;
+    background-color: #000000;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -15,7 +15,7 @@ body {
 }
 
 .register-container {
-    background: #ffffff;
+    background: #141414;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -25,7 +25,7 @@ body {
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #d8d8d8;
     margin-bottom: 30px;
     font-size: 28px;
 }
@@ -37,22 +37,22 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #555;
+    color: #d8d8d8;
     font-weight: 500;
 }
 
 input {
     width: 100%;
     padding: 12px;
+    background: #d8d8d8;
     border: 2px solid #ddd;
     border-radius: 5px;
     font-size: 14px;
-    transition: border-color 0.3s;
 }
 
 input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #1ecb0a;
 }
 
 .error {
@@ -65,19 +65,18 @@ input:focus {
 button {
     width: 100%;
     padding: 12px;
-    background: #e74c3c;
-    color: #ffffff;
+    background: #1ecb0a;
+    color: #d8d8d8;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s;
     margin-top: 10px;
 }
 
-button:hover {
-    transform: scale(1.05);
+.button:hover {
+    background-color: #19a509;
 }
 
 .footer {
@@ -96,13 +95,11 @@ button:hover {
     margin-bottom: 20px;
 }
 
-
-/* IDs */
 #login-link {
-    color: #667eea;
+    color: #1ecb0a;
     text-decoration: underline;
 }
 
 #login-link:hover {
-    color: #e74c3c;
+    color: #19a509;
 }
