@@ -15,6 +15,7 @@ FROM amazoncorretto:21
 WORKDIR /opt/exec
 COPY --from=build /app/target/*.jar /opt/exec/app.jar
 COPY --from=build /app/target/lib /opt/exec/lib
+COPY frontend /opt/exec/frontend
 EXPOSE 8080 5005
 # Run with explicit classpath (app.jar + all jars in lib/)
 CMD ["java", "-cp", "/opt/exec/app.jar:/opt/exec/lib/*", "Main"]

@@ -2,6 +2,8 @@
 
 ## Robin Mössinger, Maximilian Wagner, Nico Wieland, Jan Hauf
 
+## Robin Mössinger, Maximilian Wagner, Nico Wieland, Jan Hauf
+
 ## Run the backend locally and with Docker
 
 This project contains a Java backend (HTTP server on port 8080) and a MongoDB database. You can run it either with Docker (recommended) or locally using Maven/Java.

@@ -188,11 +188,23 @@ public class Util {
             return path.substring(0, lastSlash);
         } else if (slashCount == 2) {
             return path;
+        } else if (slashCount == 1) {
+            return path;
         } else {
+            logger.log(Level.SEVERE, "Issue pathing", path);
             sendErrorResponse(exchange, 400, "Invalid JSON format");
         }
+        logger.log(Level.SEVERE, "Issue pathing", path);
         sendErrorResponse(exchange, 400, "Invalid JSON format");
-        return path;
+        return null;
+    }
+
+    public static String guessContentType(String path) {
+        String p = path.toLowerCase();
+        if (p.endsWith(".html")) return "text/html; charset=utf-8";
+        if (p.endsWith(".css")) return "text/css; charset=utf-8";
+        if (p.endsWith(".js")) return "application/javascript; charset=utf-8";
+        throw new RuntimeException("Content type not found for path: " + path);
     }
 
     public static JsonReader createJsonReader(HttpExchange exchange) {
