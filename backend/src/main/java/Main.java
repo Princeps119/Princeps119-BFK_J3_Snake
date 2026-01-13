@@ -25,7 +25,7 @@ public class Main {
            // CORS: add headers for all responses, as test with Postman did work, but the Browsertest did not
            var headers = exchange.getResponseHeaders();
            headers.add("Access-Control-Allow-Origin", "*"); // Erlaubt Anfragen von allen Domains in productive noch auf domain einschränken
-           headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS"); // Gibt an, welche HTTP-Methoden für Cross-Origin-Anfragen erlaubt sind.
+            headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS, PATCH"); // Gibt an, welche HTTP-Methoden für Cross-Origin-Anfragen erlaubt sind.
            headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Definiert, welche benutzerdefinierten Header in der Anfrage erlaubt sind.
            headers.add("Access-Control-Max-Age", "3600"); // Gibt an, wie lange das Ergebnis des Preflight-Checks (OPTIONS) gecacht werden darf (in Sekunden).
 

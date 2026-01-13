@@ -2,15 +2,21 @@
 
 ## Robin Mössinger, Maximilian Wagner, Nico Wieland, Jan Hauf
 
-## Robin Mössinger, Maximilian Wagner, Nico Wieland, Jan Hauf
-
 ## Run the backend locally and with Docker
 
-This project contains a Java backend (HTTP server on port 8080) and a MongoDB database. You can run it either with Docker (recommended) or locally using Maven/Java.
+This project contains a Java backend (HTTP server on port 8080) and a MongoDB database .
+As well as a Frontend directory where the html pages are served (HTTP server on port 8080), when using the docker
+implementation.
+You can run it either with Docker (recommended) or locally using Maven/Java.
+For it to work you need these files which are not checked in git as per security reasons:
+`backend/src/main/resources/config.properties`
+`backend/src/main/resources/encryption.txt`
+`backend/src/main/resources/uri.txt`
 
+- Base URL (frontend): http://localhost:3000
 - Base URL (backend): http://localhost:8080
 - For development API requests can be tested with POSTMAN, ask Robin for the examples 
-- CORS: enabled for all origins. Allowed methods: GET, POST, PUT, DELETE, OPTIONS.
+- CORS: enabled for all origins. Allowed methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.
 
 ### Dockerized setup (recommended)
 
@@ -19,7 +25,7 @@ Prerequisites:
 
 Commands (execute from project root):
 1. Build and start the stack (backend + MongoDB) in the background:
-   - Linux/macOS: `docker compose -f docker/docker-compose.yml up --build -d`
+    - `docker compose -f docker/docker-compose.yml up --build -d`
 2. Check logs (optional):
    - Backend: `docker logs -f snakebackendcontainer`
    - MongoDB: `docker logs -f mongoDB`
@@ -28,7 +34,9 @@ Commands (execute from project root):
 
 Details:
 - The backend container exposes:
-  - 8080/tcp → HTTP API
+    - 8080 → HTTP API
+    - 3000 → HTTP API (for the Frontend, which the user interacts with)
+    - 5005 -> enables remote debugging of the running docker application via intellij
 - MongoDB runs in a separate container and is exposed on host port 27018.
 - Secrets/files mounted by Compose (see `docker/docker-compose.yml`):
   - `backend/src/main/resources/uri.txt` → Mongo connection string (as a Docker secret)
@@ -93,7 +101,8 @@ curl -i http://localhost:8080/api/checkBackend
     {
       "username": "yourUsername",
       "encryptedMail": "<encrypted string>",
-      "timestamp": "<encrypted string>"
+      "timestamp": "<encrypted string>", 
+      "version": "uuid saved as String"
     }
     ```
 - Error responses (examples):
@@ -140,17 +149,41 @@ curl -i \
 
 ### 4) Save Endpoint (placeholder)
 - Path: `/api/save`
-- Status: currently not implemented in the backend. Calling this endpoint will not perform any action.
+- Status: currently not implemented in the frontend. Calling this endpoint will not perform any action as the data which
+  the frontend should provide this endpoint is not done
 
 ---
 
 ### 5) Delete Endpoint (placeholder)
-- Path: `/api/delete`
-- Status: currently not implemented in the backend. Calling this endpoint will not perform any action.
 
+- Method: `DELETE`
+- Path: `/api/register`
+
+- Header: `Authorization`
+    - contains the Logintoken in the Authorization Header to check against DB to verify that a logged in user send the
+      delete request:
+  ```json
+  {
+    "username": "yourUsername",
+    "encryptedMail": "<encrypted string>",
+    "timestamp": "<encrypted string>", 
+    "version": "uuid saved as String"
+  }
+
+- Successful response:
+    - Status: `204 No Content` (no body)
+- Error response:
+    - `500 Internal Server Error`
 ---
 
 
 ## Notes for Frontend Integration
 - Always include `Content-Type: application/json` for POST requests.
 - Expect CORS headers to be present so that browser-based clients can communicate with the backend.
+
+### Endpoints:
+
+- `localhost:3000/login` after successful login user is redirected to snake page as
+- `localhost:3000/register` after successful registration user is redirected to login page
+- `localhost:3000/snake` after successful login user is redirected to snake page with his useraccount, if called
+  directly user plays as a guest
