@@ -1,0 +1,85 @@
+import com.sun.net.httpserver.HttpServer;
+import controllers.FrontendController;
+import controllers.MainController;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static services.Util.sendErrorResponse;
+
+public class Main {
+
+    public static final Logger logger = Logger.getLogger(Main.class.getName());
+
+    public static final int PORT = 8080;
+    public static final int HTML_PORT = 3000;
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
+
+        server.createContext("/", exchange -> {
+
+           // CORS: add headers for all responses, as test with Postman did work, but the Browsertest did not
+           var headers = exchange.getResponseHeaders();
+           headers.add("Access-Control-Allow-Origin", "*"); // Erlaubt Anfragen von allen Domains in productive noch auf domain einschränken
+            headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS, PATCH"); // Gibt an, welche HTTP-Methoden für Cross-Origin-Anfragen erlaubt sind.
+           headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Definiert, welche benutzerdefinierten Header in der Anfrage erlaubt sind.
+           headers.add("Access-Control-Max-Age", "3600"); // Gibt an, wie lange das Ergebnis des Preflight-Checks (OPTIONS) gecacht werden darf (in Sekunden).
+
+           // needed as for POST a browser may send an Options first to check connection
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+                return;
+            }
+
+           try {
+               final Optional<Boolean> processedRequest = MainController.processRequest(exchange);
+               if (processedRequest.isPresent() && processedRequest.get()) {
+                   logger.log(Level.INFO, "Request processed");
+               }
+           } catch (Exception e) {
+               logger.log(Level.WARNING, "Unhandled exception while processing request", e);
+               sendErrorResponse(exchange, 500, "Internal server error");
+           }
+        });
+
+        server.setExecutor(null);
+        server.start();
+        logger.info("Server running on port " + PORT);
+
+
+        final HttpServer staticServer = HttpServer.create(new InetSocketAddress(HTML_PORT), 0);
+
+        // Serve any file under /opt/exec/frontend at /
+        staticServer.createContext("/", exchange -> {
+            // Optional CORS for static too (helpful if static pages call API)
+            var headers = exchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin", "*");
+            headers.add("Access-Control-Allow-Methods", "GET,OPTIONS");
+            headers.add("Access-Control-Allow-Headers", "Content-Type");
+            headers.add("Access-Control-Max-Age", "3600");
+
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+                return;
+            }
+
+            try {
+                FrontendController.serveStaticFromRoot(exchange);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Static server error", e);
+                sendErrorResponse(exchange, 500, "Internal server error");
+            }
+        });
+
+        staticServer.setExecutor(null);
+        staticServer.start();
+        logger.info("Static site server running on port " + HTML_PORT);
+
+    }
+}

@@ -1,0 +1,26 @@
+@startuml
+title MongoRepo – Repository Layer
+
+class MongoRepo <<singleton>> {
+  - {static} SECRET_PATH : Path = "/run/secrets/MONGO_URI_FILE"
+  - {static} instance : MongoRepo
+  - userDB : MongoDatabase
+  - MongoRepo()  // privater Konstruktor
+  + {static} getInstance() : MongoRepo
+  + getUserDB() : MongoDatabase
+  + getUserCollection(collectionName : String) : MongoCollection<Document>
+  - createExampleUser() : void
+}
+
+MongoRepo ..> MongoDatabase : manages
+MongoRepo ..> MongoCollection : returns
+MongoRepo ..> Document : inserts example user
+
+note right of MongoRepo
+Initialisiert DB-Verbindung:
+- URI aus Docker Secret (/run/secrets/MONGO_URI_FILE)
+- Fallback: lokale URI
+Erstellt Collection "users" mit Unique-Index auf mail
+Legt Beispiel-User an (SHA-256 Hash)
+end note
+@enduml

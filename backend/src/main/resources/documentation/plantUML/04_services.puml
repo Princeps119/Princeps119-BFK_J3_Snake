@@ -1,0 +1,75 @@
+
+@startuml
+title Services – Login, Registrierung, Utilities, Token
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+' External stubs
+class HttpExchange <<external>>
+class Key <<external>>
+class MongoCollection <<external>>
+class Document <<external>>
+class Logger <<external>>
+
+package "services" {
+  class LoginService <<singleton>> {
+    - logger : Logger
+    - {static} instance : LoginService
+    - userCollection : MongoCollection<Document>
+    + {static} getInstance() : LoginService
+    - LoginService()
+    + checkLoginData(mail : String, password : String) : TokenData
+  }
+
+  class RegistrationService <<singleton>> {
+    - logger : Logger
+    - {static} instance : RegistrationService
+    - userCollection : MongoCollection<Document>
+    + {static} getInstance() : RegistrationService
+    - RegistrationService()
+    + register(registerData : RegisterData) : Boolean
+    - checkEmailAndPassword(registerData : RegisterData) : boolean
+    + {static} hasLowerAndUpper(password : String) : boolean
+  }
+
+  class Util {
+    + {static} hashPassword(password : String) : String
+    + {static} validateInputs(method : String, exchange : HttpExchange) : boolean
+    + {static} sendErrorResponse(exchange : HttpExchange, statusCode : int, errorMsg : String) : void
+  }
+
+  class TokenEncrypter {
+    + {static} logger : Logger
+    + {static} key : Key
+    + {static} encrypt(token : String) : String
+    + {static} decrypt(token : String) : String
+  }
+}
+
+LoginService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
+LoginService o--> MongoCollection : userCollection
+LoginService ..> Document
+LoginService ..> services.Util : hashPassword(...)
+LoginService ..> services.TokenEncrypter : encrypt(...)
+LoginService ..> data.TokenData : returns
+LoginService ..> exceptions.UserNotFoundException : throws
+
+RegistrationService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
+RegistrationService o--> MongoCollection : userCollection
+RegistrationService ..> Document : insertOne(...)
+RegistrationService ..> services.Util : hashPassword(...)
+RegistrationService ..> data.RegisterData : uses
+
+Util ..> HttpExchange
+TokenEncrypter ..> Key
+
+note right of TokenEncrypter
+AES-Schlüsselquelle:
+- ENV: ENCRYPTION_KEY
+- Fallback: config.properties (encryption.key)
+Methoden:
+- encrypt(token) : AES + Base64
+- decrypt(token) : AES + Base64
+end note
+@enduml

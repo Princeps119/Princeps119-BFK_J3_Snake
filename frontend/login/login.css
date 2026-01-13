@@ -1,0 +1,109 @@
+html,
+body {
+    margin: 0;
+}
+
+body {
+    background-color: #000000;
+    background-image: url("/login/black-scales.webp");
+    background-repeat: repeat;
+    color: #d8d8d8;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a:link {
+    color: #1ecb0a;
+}
+
+a:visited {
+    color: #00ffb3;
+}
+
+a:hover,
+a:focus {
+    color: #19a509;
+    text-decoration: underline;
+}
+
+h1 {
+    display: grid;
+    position: relative;
+    color: #d8d8d8;
+    font-size: 300%;
+    margin-bottom: 30px;
+    margin-top: auto;
+}
+
+p {
+    font-size: 105%;
+}
+
+.Grid_container_main {
+    display: grid;
+    height: 100vh;
+    width: 100vw;
+}
+
+.Grid_container_login {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.login-form {
+    position: relative;
+    background-color: #141414;
+    max-width: 400px;
+    padding: 3vw;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+input::placeholder {
+    color: #141414;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-input {
+    background-color: #1ecb0a;
+    color: #141414;
+    width: 100%;
+    padding: 5% 7%;
+    font-size: 110%;
+    border: 1px solid #109c00;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-message {
+    margin-top: -10px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.error-message {
+    display: flex;
+    color: #ff0000;
+    font-size: 115%;
+}
+
+/* Basis-Button-Stil */
+.button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    border: 1px solid #109c00;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #1ecb0a;
+    color: #141414;
+}
+
+.button:hover {
+    background-color: #19a509;
+}

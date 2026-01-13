@@ -1,0 +1,24 @@
+@startuml
+title Data – Records (DTOs)
+
+skinparam classAttributeIconSize 0
+
+package "data" {
+  class LoginData <<record>> {
+    + mail() : String
+    + password() : String
+  }
+
+  class RegisterData <<record>> {
+    + username() : String
+    + mail() : String
+    + password() : String
+  }
+
+  class TokenData <<record>> {
+    + username() : String
+    + encryptedMail() : String
+    + timestamp() : String
+  }
+}
+@enduml

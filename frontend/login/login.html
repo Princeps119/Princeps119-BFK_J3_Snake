@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta description for SEO-->
+    <meta name="description" content="Login for Snake.">
+    <!-- Favicon -->
+    <link rel="icon" href="/login/Snake_favicon.webp" type="webp/x-icon">
+    <!-- Title -->
+    <title>Login</title>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/login/login.css">
+    <!-- script -->
+    <script src=/login/script.js></script>
+</head>
+
+<body>
+    <div class="Grid_container_main">
+        <div class="Grid_container_login">
+
+            <!--Login-->
+            <div class="login-form"> <!-- Hauptcontainer für das Login-Formular -->
+                <div>
+                    <h1>Snake-Login</h1>
+                </div>
+
+                <div class="form-group"> <!-- Container für das E-Mail-Feld -->
+                    <input class="form-input" type="text" name="email" id="user_name" placeholder="Email"><!-- Jan -->
+                </div>
+                <div class="form-message error-message"> <!-- Container für die E-Mail-Fehlermeldung -->
+                    <p hidden id="error_massage_email">generierter Fehler</p><!-- Jan -->
+                </div>
+
+                <div class="form-group"> <!-- Container für das Passwort-Feld -->
+                    <input class="form-input" type="password" name="password" id="user_pw"
+                        placeholder="Password"><!-- Jan -->
+                </div>
+                <div class="form-message error-message"> <!-- Container für die Passwort-Fehlermeldung -->
+                    <p hidden id="error_massage_pw"> generierter Fehler</p><!-- Jan -->
+                </div>
+
+                <div class="form-actions"> <!-- Container für den Login-Button -->
+                    <button id="approve" onclick="buttoncklicked('user_name')" class="button button--primary"
+                        type="submit">Login</button><!-- jan -->
+                </div>
+                <!--Register-->
+                <div class="form-group">
+                    <p class="Register_styles">No account?&nbsp;<a href="/register">Register</a>&nbsp;now
+                    <p><!-- add link for register page-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
