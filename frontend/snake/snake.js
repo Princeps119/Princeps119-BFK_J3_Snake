@@ -27,13 +27,9 @@ function init() {
   const canvas = document.getElementById("gameCanvas");
   let canvash = canvas.attributes.height.value;
   let canvasw = canvas.attributes.width.value;
-  //console.log(canvasw);
-  //console.log(canvash);
   const playgroundh = parseInt(canvash) / scale;
   const playgroundw = parseInt(canvasw) / scale;
 
-  //console.log(playgroundh);
-  //console.log(playgroundw);
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "rgb(0 0 0)";
   let i = 1;

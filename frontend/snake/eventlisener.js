@@ -1,5 +1,5 @@
 document.addEventListener("keydown", function (event) {
-
+    //anpassung max
     const key = event.key;
      if (
       key === "w" || key === "W" ||
@@ -14,7 +14,7 @@ document.addEventListener("keydown", function (event) {
     ) {
       event.preventDefault();
     }
-    
+    //
     if (event.key === "w" || event.key === "W" || event.key === "ArrowUp") {
         direction="Up"
     }
