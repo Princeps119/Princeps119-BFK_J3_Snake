@@ -8,11 +8,20 @@ let foodColor = "green";
 let foodX = 10;
 let foodY = 10;
 
-let scale = 20; // hier skallieren felder
 
 let direction = "Right";
 
-let relodegame = setInterval(game, 500); //Spiel geschindigkeit
+let scale = 20;                
+let gameSpeedMs = 400;         
+let relodegame = null;         
+function startGameLoop() {
+  if (relodegame !== null) clearInterval(relodegame);
+  relodegame = setInterval(game, gameSpeedMs);
+}
+
+startGameLoop();
+
+
 let score = 0;
 function init() {
   const canvas = document.getElementById("gameCanvas");
@@ -143,3 +152,27 @@ function checkWallCollision() {
     gameOver();
   }
 }
+
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const newSpeed = parseInt(document.getElementById("speed").value, 10);
+  const newScale = parseInt(document.getElementById("gridSize").value, 10);
+
+  gameSpeedMs = newSpeed;
+  scale = newScale;
+
+  resetGameState();
+
+  startGameLoop();
+});
+
+function resetGameState() {
+  snakeX = 0;
+  snakeY = 0;
+  direction = "Right";
+  score = 0;
+  document.getElementById("Score").innerHTML = "Score: " + score;
+
+  generateNewFood();
+}
+
+
