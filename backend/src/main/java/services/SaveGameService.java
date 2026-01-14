@@ -65,7 +65,7 @@ public class SaveGameService {
         try {
             userCollection.updateOne(
                     Filters.eq("mail", decryptedMail),
-                    Updates.set("SnakePositionData", snakeData)
+                    Updates.set("snakeposition", snakeData)
             );
 
         } catch (NullPointerException e) {
