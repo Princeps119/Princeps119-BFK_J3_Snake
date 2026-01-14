@@ -41,7 +41,7 @@ async function buttoncklicked(id) {
 
       console.log(responseData);
       setTimeout(
-        () => (window.location.href = "/frontend/snake/snake.html"),
+          () => (window.location.href = "/snake"),
         2000
       );
     } else {

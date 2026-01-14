@@ -51,7 +51,7 @@ form.addEventListener("submit", async (e) => {
       if (response.ok) {
         successMsg.style.display = "block";
         form.reset();
-        setTimeout(() => (window.location.href = "/login/login.html"), 1000);
+        setTimeout(() => (window.location.href = "/login"), 1000);
       } else {
         alert("Fehler: Registrierung fehlgeschlagen");
       }

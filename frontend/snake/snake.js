@@ -232,8 +232,11 @@ async function senddata() {
     }),
   });
 
-  console.log("Response status:", response);
-
+  if (response.ok) { // true for status 200-299
+    alert("Save successful!");
+  } else {
+    alert("Save failed: " + response.status);
+  }
 }
 
 if (storedDataForSnake) {
