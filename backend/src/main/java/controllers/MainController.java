@@ -226,10 +226,19 @@ public class MainController {
                 try {
                     final SaveGameService saveService = SaveGameService.getInstance();
                     final SnakePositionData snakeData = readJSON(exchange, SnakePositionData.class);
-                    return saveService.saveSnakePosition(exchange, snakeData);
+                    final boolean result = saveService.saveSnakePosition(exchange, snakeData);
+                    if (result) {
+                        exchange.sendResponseHeaders(200, -1);
+                        exchange.close();
+                        return true;
+                    } else {
+                        sendErrorResponse(exchange, 500, "Error processing save request");
+                    }
 
                 } catch (UserNotFoundException e) {
                     sendErrorResponse(exchange, 400, "User not found");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
             return false;
