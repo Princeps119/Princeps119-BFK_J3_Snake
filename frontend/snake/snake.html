@@ -7,108 +7,110 @@
 
   <link rel="stylesheet" href="/snake/snake.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous" />
+        crossorigin="anonymous"/>
 
   <title>🐍 Snake</title>
 </head>
 
 <body onload="init()">
-  <div id="settings-dialog">
+<div id="settings-dialog">
     <h2>Einstellungen</h2>
 
     <label for="speed">Geschwindigkeit</label>
     <select id="speed">
-      <option value="600">Langsam</option>
-      <option value="400" selected>Mittel</option>
-      <option value="200">Schnell</option>
-      <option value="50">Extrem</option>
+        <option value="600">Langsam</option>
+        <option value="400" selected>Mittel</option>
+        <option value="200">Schnell</option>
+        <option value="50">Extrem</option>
     </select>
 
     <label for="gridSize">Spielfeldgröße</label>
     <select id="gridSize">
-      <option value="20" selected>20 × 20</option>
-      <option value="25">25 × 25</option>
-      <option value="30">30 × 30</option>
+        <option value="20" selected>20 × 20</option>
+        <option value="25">25 × 25</option>
+        <option value="30">30 × 30</option>
     </select>
 
     <div id="user-actions">
-      <button class="logoutBtn" onclick="logout()">Logout</button>
-      <button class="deleteBtn" onclick="deleteUser()">Benutzerkonto löschen</button>
+        <button class="logoutBtn" onclick="logout()">Logout</button>
+        <button class="deleteBtn" onclick="deleteUser()">Benutzerkonto löschen</button>
     </div>
 
-        <div id="login-dialog">
-            Noch keinen Account?
-            <a href="/login">Anmelden</a>
-        </div>
+    <div id="login-dialog">
+        Noch keinen Account?
+        <a href="/login">Anmelden</a>
+    </div>
 
     <span>
       Bei Änderung der Werte wird das laufende Spiel automatisch neu gestartet.
     </span>
 
     <button id="saveSettings">Speichern & Schließen</button>
-  </div>
+</div>
 
-  <main class="main-container">
+<main class="main-container">
     <button class="settings-btn" id="openSettings">
-      <i class="fa-solid fa-gear"></i>
+        <i class="fa-solid fa-gear"></i>
     </button>
 
     <header class="header">
-      <h1>Snake Spiel 🐍</h1>
-      <span>Hallo <span id="username">Spieler</span></span>
+        <h1>Snake Spiel 🐍</h1>
+        <span>Hallo <span id="username">Spieler</span></span>
     </header>
 
     <section class="game-container">
-      <div class="game-and-info">
-        <div class="game-column">
-          <div class="score-board">
-            <p>Score: <span id="Score">0</span></p>
-            <p>Highscore: <span id="highscore">0</span></p>
-          </div>
+        <div class="game-and-info">
+            <div class="game-column">
+                <div class="score-board">
+                    <p>Score: <span id="Score">0</span></p>
+                    <p>Highscore: <span id="highscore">0</span></p>
+                    <button id="saveButton" onclick="senddata()" hidden="true">Save Game</button>
+                </div>
 
-          <canvas id="gameCanvas" width="500" height="500" style="background: rgb(1, 73, 1); border: 5px solid #000">
-            Snake Game lädt nicht
-          </canvas>
+                <canvas id="gameCanvas" width="500" height="500"
+                        style="background: rgb(1, 73, 1); border: 5px solid #000">
+                    Snake Game lädt nicht
+                </canvas>
+            </div>
+
+            <aside class="info-column">
+                <div class="info-box">
+                    <h3>Spielanleitung</h3>
+
+                    <div class="controls">
+                        <h4>Bewegung</h4>
+                        <div class="control-keys">
+                            <span><strong>W</strong> – Nach oben</span>
+                            <span><strong>A</strong> – Nach links</span>
+                            <span><strong>S</strong> – Nach unten</span>
+                            <span><strong>D</strong> – Nach rechts</span>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <h4>Steuerung</h4>
+                        <div class="control-keys">
+                            <span><strong>Leertaste</strong> – Pause / Fortsetzen</span>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <h4>Ziel</h4>
+                        <p>
+                            Sammle die grünen Früchte, um Punkte zu erhalten. Vermeide
+                            Wände und den Schlangenkörper, um nicht zu sterben.
+                        </p>
+                    </div>
+                </div>
+            </aside>
         </div>
-
-        <aside class="info-column">
-          <div class="info-box">
-            <h3>Spielanleitung</h3>
-
-            <div class="controls">
-              <h4>Bewegung</h4>
-              <div class="control-keys">
-                <span><strong>W</strong> – Nach oben</span>
-                <span><strong>A</strong> – Nach links</span>
-                <span><strong>S</strong> – Nach unten</span>
-                <span><strong>D</strong> – Nach rechts</span>
-              </div>
-            </div>
-
-            <div class="controls">
-              <h4>Steuerung</h4>
-              <div class="control-keys">
-                <span><strong>Leertaste</strong> – Pause / Fortsetzen</span>
-              </div>
-            </div>
-
-            <div class="controls">
-              <h4>Ziel</h4>
-              <p>
-                Sammle die grünen Früchte, um Punkte zu erhalten. Vermeide
-                Wände und den Schlangenkörper, um nicht zu sterben.
-              </p>
-            </div>
-          </div>
-        </aside>
-      </div>
     </section>
 
-  </main>
+</main>
 
-        <script src="/snake/snake.js"></script>
-        <script src="/snake/eventlisener.js"></script>
-        <script src="/snake/main.js"></script>
+<script src="/snake/snake.js"></script>
+<script src="/snake/eventlisener.js"></script>
+<script src="/snake/main.js"></script>
 </body>
 
 </html>
