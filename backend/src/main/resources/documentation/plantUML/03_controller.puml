@@ -5,32 +5,32 @@ skinparam classAttributeIconSize 0
 
 class MainController {
   {static} logger : Logger
-  - mapping : ArrayList<String> = ["/api/login","/api/save","/api/checkBackend","/api/register","/api/delete"]
+  - mapping : ArrayList<String> = ["/api/login","/api/save","/api/checkBackend","/api/register","/api/delete","/api/load","/api/logout"]
   {static} POST : String = "POST"
   {static} GET  : String = "GET"
-  {static} PUT  : String = "PUT"
+  {static} PATCH : String = "PATCH"
   {static} DELETE : String = "DELETE"
   {static} CONTENT_TYPE_JSON : String = "application/json"
 
   + {static} processRequest(exchange : HttpExchange) : Optional<Boolean>
   - {static} checkMapping(path : String, method : String, exchange : HttpExchange) : Boolean
-  - {static} checkPath(path : String, exchange : HttpExchange) : String
+  - {static} logout(method : String, exchange : HttpExchange) : boolean
   - {static} delete(method : String, exchange : HttpExchange) : Boolean
   - {static} register(method : String, exchange : HttpExchange) : Boolean
-  + {static} createJsonReader(exchange : HttpExchange) : JsonReader
   - {static} login(method : String, exchange : HttpExchange) : boolean
   - {static} save(method : String, exchange : HttpExchange) : Boolean
+  - {static} load(method : String, exchange : HttpExchange) : Boolean
   - {static} checkBackend(method : String, exchange : HttpExchange) : Boolean
-  - {static} <T> readJSON(exchange : HttpExchange, clazz : Class<T>) : T
 }
 
-MainController ..> services.LoginService : login(...)
+MainController ..> services.LoginService : login(...), logout(...)
 MainController ..> services.RegistrationService : register(...)
 MainController ..> services.DeletionService : delete(...)
-MainController ..> data.LoginData : readJSON(...)
-MainController ..> data.RegisterData : readJSON(...)
-MainController ..> data.TokenData : login(...) returns
+MainController ..> services.SaveGameService : save(...), load(...)
+MainController ..> data.LoginData
+MainController ..> data.RegisterData
+MainController ..> data.TokenData
+MainController ..> data.SnakePositionData
 MainController ..> Gson : serialize/deserialize
-MainController ..> JsonReader : createJsonReader(...)
-MainController ..> services.Util : validateInputs(...), sendErrorResponse(...)
+MainController ..> services.Util : readJSON(...), sendErrorResponse(...)
 @enduml

@@ -4,6 +4,7 @@ title Main – Serverstart & CORS
 class Main {
   {static} logger : Logger
   {static} PORT : int = 8080
+  {static} HTML_PORT : int = 3000
   + main(args : String[]) : void
 }
 
@@ -13,12 +14,14 @@ class InetSocketAddress <<external>>
 Main ..> HttpServer : create(...), start(...)
 Main ..> InetSocketAddress
 Main ..> controllers.MainController : processRequest(...)
+Main ..> controllers.FrontendController : serveStaticFromRoot(...)
 Main ..> services.Util : sendErrorResponse(...)
 
 note right of Main
+API-Server (Port 8080) & Static-Server (Port 3000)
 CORS-Header (global):
 - Access-Control-Allow-Origin: *
-- Allow-Methods: GET,POST,PUT,DELETE,OPTIONS
+- Allow-Methods: GET,POST,PUT,DELETE,OPTIONS, PATCH
 - Allow-Headers: Content-Type, Authorization
 - Max-Age: 3600
 Behandelt OPTIONS-Preflight mit 204.

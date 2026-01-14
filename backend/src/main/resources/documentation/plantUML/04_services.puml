@@ -14,16 +14,18 @@ class Logger <<external>>
 
 package "services" {
   class LoginService <<singleton>> {
-    - logger : Logger
+    - {static} logger : Logger
     - {static} instance : LoginService
     - userCollection : MongoCollection<Document>
     + {static} getInstance() : LoginService
     - LoginService()
+    + logout(loginToken : TokenData) : boolean
     + checkLoginData(mail : String, password : String) : TokenData
+    + getMailAndPassword(exchange : HttpExchange) : LoginData
   }
 
   class RegistrationService <<singleton>> {
-    - logger : Logger
+    + {static} logger : Logger
     - {static} instance : RegistrationService
     - userCollection : MongoCollection<Document>
     + {static} getInstance() : RegistrationService
@@ -33,10 +35,25 @@ package "services" {
     + {static} hasLowerAndUpper(password : String) : boolean
   }
 
+  class SaveGameService <<singleton>> {
+    - {static} logger : Logger
+    - {static} instance : SaveGameService
+    - userCollection : MongoCollection<Document>
+    + {static} getInstance() : SaveGameService
+    - SaveGameService()
+    + loadGame(exchange : HttpExchange) : SnakePositionData
+    + saveSnakePosition(exchange : HttpExchange, snakeData : SnakePositionData) : boolean
+  }
+
   class Util {
     + {static} hashPassword(password : String) : String
     + {static} validateInputs(method : String, exchange : HttpExchange) : boolean
     + {static} sendErrorResponse(exchange : HttpExchange, statusCode : int, errorMsg : String) : void
+    + {static} checkLoginToken(exchange : HttpExchange, userCollection : MongoCollection<Document>) : String
+    + {static} readJSON(exchange : HttpExchange, clazz : Class<T>) : T
+    + {static} checkPath(path : String, exchange : HttpExchange) : String
+    + {static} guessContentType(path : String) : String
+    + {static} createJsonReader(exchange : HttpExchange) : JsonReader
   }
 
   class TokenEncrypter {
@@ -45,23 +62,45 @@ package "services" {
     + {static} encrypt(token : String) : String
     + {static} decrypt(token : String) : String
   }
+  class DeletionService <<singleton>> {
+    - {static} logger : Logger
+    - {static} instance : DeletionService
+    - userCollection : MongoCollection<Document>
+    + {static} getInstance() : DeletionService
+    - DeletionService()
+    + deleteUser(exchange : HttpExchange) : boolean
+  }
 }
 
 LoginService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
 LoginService o--> MongoCollection : userCollection
 LoginService ..> Document
-LoginService ..> services.Util : hashPassword(...)
-LoginService ..> services.TokenEncrypter : encrypt(...)
-LoginService ..> data.TokenData : returns
-LoginService ..> exceptions.UserNotFoundException : throws
+LoginService ..> services.Util : hashPassword(...), readJSON(...), sendErrorResponse(...)
+LoginService ..> services.TokenEncrypter : encrypt(...), decrypt(...)
+LoginService ..> data.TokenData
+LoginService ..> exceptions.UserNotFoundException
+LoginService ..> exceptions.EncryptionException
 
 RegistrationService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
 RegistrationService o--> MongoCollection : userCollection
 RegistrationService ..> Document : insertOne(...)
 RegistrationService ..> services.Util : hashPassword(...)
-RegistrationService ..> data.RegisterData : uses
+RegistrationService ..> data.RegisterData
+
+SaveGameService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
+SaveGameService o--> MongoCollection : userCollection
+SaveGameService ..> Document
+SaveGameService ..> services.Util : checkLoginToken(...)
+SaveGameService ..> data.SnakePositionData
+SaveGameService ..> exceptions.UserNotFoundException
+
+DeletionService ..> repository.MongoRepo : getInstance(), getUserCollection(...)
+DeletionService o--> MongoCollection : userCollection
+DeletionService ..> services.Util : checkLoginToken(...)
 
 Util ..> HttpExchange
+Util ..> JsonReader <<external>>
+Util ..> Gson <<external>>
 TokenEncrypter ..> Key
 
 note right of TokenEncrypter

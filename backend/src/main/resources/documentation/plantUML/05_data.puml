@@ -19,6 +19,29 @@ package "data" {
     + username() : String
     + encryptedMail() : String
     + timestamp() : String
+    + version() : String
+  }
+
+  class GameSave <<record>> {
+    + highscore() : Highscore
+    + snakePositionData() : SnakePositionData
+  }
+
+  class Highscore <<record>> {
+    + highscore() : int
+  }
+
+  class Position <<record>> {
+    + x() : int
+    + y() : int
+  }
+
+  class SnakePositionData <<record>> {
+    + snake() : List<Position>
   }
 }
+
+GameSave "1" *-- "1" Highscore
+GameSave "1" *-- "1" SnakePositionData
+SnakePositionData "1" *-- "many" Position
 @enduml

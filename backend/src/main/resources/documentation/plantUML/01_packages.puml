@@ -7,14 +7,16 @@ package "root" {
 
 package "controllers" {
   class MainController
+  class FrontendController
 }
 
 package "services" {
   class LoginService <<singleton>>
   class RegistrationService <<singleton>>
+  class SaveGameService <<singleton>>
   class Util
   class TokenEncrypter
-  class DeletionService <<stub>>
+  class DeletionService <<singleton>>
 }
 
 package "repository" {
@@ -25,10 +27,15 @@ package "data" {
   class LoginData <<record>>
   class RegisterData <<record>>
   class TokenData <<record>>
+  class GameSave <<record>>
+  class Highscore <<record>>
+  class Position <<record>>
+  class SnakePositionData <<record>>
 }
 
 package "exceptions" {
-  class UserNotFoundException <<stub>>
+  class UserNotFoundException
+  class EncryptionException
 }
 
 package "external" {
@@ -45,17 +52,23 @@ package "external" {
 
 /* Beziehungen */
 Main ..> controllers.MainController : processRequest(...)
+Main ..> controllers.FrontendController : serveStaticFromRoot(...)
 Main ..> services.Util : sendErrorResponse(...)
 
 controllers.MainController ..> services.LoginService
 controllers.MainController ..> services.RegistrationService
 controllers.MainController ..> services.DeletionService
+controllers.MainController ..> services.SaveGameService
 controllers.MainController ..> data.LoginData
 controllers.MainController ..> data.RegisterData
 controllers.MainController ..> data.TokenData
+controllers.MainController ..> data.SnakePositionData
 controllers.MainController ..> Gson
 controllers.MainController ..> JsonReader
 controllers.MainController ..> HttpExchange
+
+controllers.FrontendController ..> services.Util : sendErrorResponse(...)
+controllers.FrontendController ..> HttpExchange
 
 services.LoginService ..> repository.MongoRepo
 services.LoginService o--> MongoCollection
@@ -72,6 +85,13 @@ services.RegistrationService ..> Document
 services.RegistrationService ..> Filters
 services.RegistrationService ..> services.Util
 services.RegistrationService ..> data.RegisterData
+
+services.SaveGameService ..> repository.MongoRepo
+services.SaveGameService o--> MongoCollection
+services.SaveGameService ..> Document
+services.SaveGameService ..> services.Util : checkLoginToken(...)
+services.SaveGameService ..> data.SnakePositionData
+services.SaveGameService ..> exceptions.UserNotFoundException
 
 services.Util ..> HttpExchange
 services.TokenEncrypter ..> Key <<external>>
