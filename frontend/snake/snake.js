@@ -63,7 +63,9 @@ document.getElementById("saveSettings").addEventListener("click", () => {
   gameSpeedMs = newSpeed;
   scale = newScale;
 
-  game();
+  resetGameState()
+  clearInterval(reloadgame);
+  reloadgame = setInterval(game, gameSpeedMs);
 });
 
 
@@ -180,8 +182,10 @@ function generateNewFood() {
 }
 
 function gameOver() {
-  clearInterval(relodegame);
+  clearInterval(reloadgame);
   alert("Verloren mit dem Score: " + score);
+  resetGameState()
+  reloadgame = setInterval(game, gameSpeedMs);
 }
 
 function checkWallCollision() {
@@ -243,4 +247,18 @@ if (storedDataForSnake) {
   let button = document.getElementById("saveButton");
   button.removeAttribute("hidden");
   button.color.white = "#FFFFFF";
+}
+
+function resetGameState() {
+    snake = [{x: 0, y: 0},
+        {x: -1, y: 0},
+        {x: -2, y: 0}
+    ];
+    snakeX = 0;
+    snakeY = 0;
+    direction = "Right";
+    pause = "false";
+    score = 0;
+    document.getElementById("Score").innerHTML = "Score: " + score;
+    generateNewFood();
 }
