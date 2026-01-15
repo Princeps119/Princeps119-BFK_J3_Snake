@@ -49,10 +49,6 @@ document.addEventListener("keydown", function (event) {
 
     if (event.key === " ") {
         if (pause === "true") {
-            if (gameSpeedMs != null) {
-                console.log("in setting gamespseed");
-                gameSpeedMs = 400;
-            }
             console.log("gamespeed", gameSpeedMs)
             reloadgame = setInterval(game, gameSpeedMs);
             pause = "false";

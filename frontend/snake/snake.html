@@ -22,6 +22,7 @@
         <option value="400" selected>Mittel</option>
         <option value="200">Schnell</option>
         <option value="50">Extrem</option>
+        <option value="10">Unspielbar</option>
     </select>
 
     <label for="gridSize">Spielfeldgröße</label>
@@ -29,6 +30,7 @@
         <option value="20" selected>20 × 20</option>
         <option value="25">25 × 25</option>
         <option value="30">30 × 30</option>
+        <option value="60">60 × 60</option>
     </select>
 
     <div id="user-actions">
@@ -78,19 +80,15 @@
                     <h3>Spielanleitung</h3>
 
                     <div class="controls">
-                        <h4>Bewegung</h4>
-                        <div class="control-keys">
-                            <span><strong>W</strong> – Nach oben</span>
-                            <span><strong>A</strong> – Nach links</span>
-                            <span><strong>S</strong> – Nach unten</span>
-                            <span><strong>D</strong> – Nach rechts</span>
-                        </div>
-                    </div>
-
-                    <div class="controls">
                         <h4>Steuerung</h4>
                         <div class="control-keys">
+                            <span><strong>W</strong> oder <strong>↑</strong> – Nach oben</span>
+                            <span><strong>A</strong> oder <strong>←</strong> – Nach links</span>
+                            <span><strong>S</strong> oder <strong>↓</strong> – Nach unten</span>
+                            <span><strong>D</strong> oder <strong>→</strong> – Nach rechts</span>
+                            <div class="control-keys">
                             <span><strong>Leertaste</strong> – Pause / Fortsetzen</span>
+                        </div>
                         </div>
                     </div>
 

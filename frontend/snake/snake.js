@@ -167,7 +167,7 @@ function snake_generate(snake) {
 function Snake_eat() {
   if (snakeX == foodX && snakeY == foodY) {
     score = score + 1;
-    document.getElementById("Score").innerHTML = "Score: " + score;
+    document.getElementById("Score").innerHTML = score;
     snake.push(zwischen);
     snake_generate(snake);
     generateNewFood();
