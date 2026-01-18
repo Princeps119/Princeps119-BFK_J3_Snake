@@ -216,11 +216,18 @@ function checkSnakeCollision() {
   }
 }
 
+const data = {
+  settings: [
+    {gamesize: scale},
+    {gamespeed: gameSpeedMs}
+  ]
+};
+
 async function senddata() {
 
 
   let test = JSON.stringify({
-    snakeposition: snake,
+    snakeposition: snake, settings: data, highscore: score
   });
   console.log("Response data:", test);
 
@@ -231,8 +238,7 @@ async function senddata() {
       Authorization: "Bearer " + storedDataForSnake,
     },
     body: JSON.stringify({
-      snakeposition: snake,
-
+      snakeposition: snake, settings: data, highscore: score
     }),
   });
 
