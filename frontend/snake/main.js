@@ -1,4 +1,5 @@
 const storedData = sessionStorage.getItem("userData");
+let isUserDelete = false;
 let username = null;
 console.log(storedData);
 if (storedData) {
@@ -20,23 +21,17 @@ if (username) {
   userActions.style.display = "none";
   loginDialog.style.display = "block";
 }
+
 const settingsDialog = document.getElementById("settings-dialog");
 
-document.getElementById("openSettings").addEventListener("click", () => {
+function openSettings() {
   settingsDialog.style.display = "block";
-});
+}
 
-document.getElementById("saveSettings").addEventListener("click", () => {
+function closeSettings() {
+  closeConfirmDialog();
   settingsDialog.style.display = "none";
-});
-
-document.getElementById("confirm-dialog").addEventListener("click", () => {
-  confirmDialog.style.display = "block";
-});
-
-document.getElementById("cancelDelete").addEventListener("click", () => {
-  confirmDialog.style.display = "none";
-});
+}
 
 async function logout() {
   try {
@@ -77,6 +72,7 @@ async function deleteUser() {
     if (response.ok) {
       sessionStorage.removeItem("userData");
       window.location.reload();
+      alert("Benutzerkonto gelöscht");
     } else {
       alert("Fehler: Löschen fehlgeschlagen");
     }
@@ -88,5 +84,19 @@ async function deleteUser() {
 }
 
 function openConfirmDialog() {
-  document.getElementById("confirm-dialog").style.display = "block";
+  isUserDelete = true;
+  document.getElementById("confirm-actions").style.display = "block";
+  document.getElementById("user-actions").style.display = "none";
+}
+
+function confirmAction() {
+  if (isUserDelete) {
+    deleteUser();
+  }
+}
+
+function closeConfirmDialog() {
+  isUserDelete = false;
+  document.getElementById("confirm-actions").style.display = "none";
+  document.getElementById("user-actions").style.display = "block";
 }
