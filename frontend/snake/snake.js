@@ -265,3 +265,26 @@ function resetGameState() {
     document.getElementById("Score").innerHTML = "Score: " + score;
     generateNewFood();
 }
+
+async function loadgame() {
+
+  let test = JSON.stringify({
+    snakeposition: snake,
+  });
+  console.log("Response data:", test);
+
+  const response = await fetch("http://localhost:8080/api/load", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + storedDataForSnake,
+    },
+  })
+      .then(res => res.json())
+      .then(data => console.log(data));
+  if (response.ok) { // true for status 200-299
+    alert("Save successful!");
+  } else {
+    alert("Save failed: " + response.status);
+  }
+}
