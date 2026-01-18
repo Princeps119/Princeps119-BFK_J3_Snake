@@ -180,7 +180,7 @@ function generateNewFood() {
 }
 
 function gameOver() {
-  clearInterval(relodegame);
+  clearInterval(reloadgame);
   alert("Verloren mit dem Score: " + score);
 }
 
