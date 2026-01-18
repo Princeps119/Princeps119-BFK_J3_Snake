@@ -66,5 +66,5 @@ document.addEventListener("keydown", function (event) {
         isWaiting=false;
 
 
-    },2000);
+    },gameSpeedMs);
 });
