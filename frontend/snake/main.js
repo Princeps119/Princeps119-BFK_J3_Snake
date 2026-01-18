@@ -98,5 +98,7 @@ function confirmAction() {
 function closeConfirmDialog() {
   isUserDelete = false;
   document.getElementById("confirm-actions").style.display = "none";
-  document.getElementById("user-actions").style.display = "block";
+  if (username) {
+    document.getElementById("user-actions").style.display = "block";
+  }
 }
