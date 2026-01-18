@@ -247,9 +247,10 @@ async function senddata() {
 }
 
 if (storedDataForSnake) {
-  let button = document.getElementById("saveButton");
-  button.removeAttribute("hidden");
-  button.color.white = "#FFFFFF";
+  let saveButton = document.getElementById("saveButton");
+  saveButton.removeAttribute("hidden");
+  let loadButton = document.getElementById("loadButton");
+  loadButton.removeAttribute("hidden");
 }
 
 function resetGameState() {
