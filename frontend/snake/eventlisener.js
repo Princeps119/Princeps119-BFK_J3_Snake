@@ -1,6 +1,7 @@
 document.addEventListener("keydown", function (event) {
     //anpassung max
     const key = event.key;
+    if (isWaiting) return;
     if (
         key === "w" || key === "W" ||
         key === "a" || key === "A" ||
@@ -58,4 +59,12 @@ document.addEventListener("keydown", function (event) {
             pause = "true";
         }
     }
+
+     isWaiting = true;
+
+    setTimeout(()=>{
+        isWaiting=false;
+
+
+    },2000);
 });
