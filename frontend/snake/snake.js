@@ -281,10 +281,16 @@ async function loadgame() {
       Authorization: "Bearer " + storedDataForSnake,
     },
   })
-      .then(res => res.json())
-      .then(data => console.log(data));
   if (response.ok) { // true for status 200-299
-    alert("Save successful!");
+    alert("Load successful!");
+    clearInterval(reloadgame);
+    const data = await response.json();
+    console.log(data);
+    snake = data.snakeposition;
+    console.log("snakeposition: " + JSON.stringify(snake));
+    scale = data.settings.gamesize;
+    gameSpeedMs = data.settings.gamespeed;
+    reloadgame = setInterval(game, gameSpeedMs);
   } else {
     alert("Save failed: " + response.status);
   }
