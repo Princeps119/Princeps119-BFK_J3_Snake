@@ -30,6 +30,14 @@ document.getElementById("saveSettings").addEventListener("click", () => {
   settingsDialog.style.display = "none";
 });
 
+document.getElementById("confirm-dialog").addEventListener("click", () => {
+  confirmDialog.style.display = "block";
+});
+
+document.getElementById("cancelDelete").addEventListener("click", () => {
+  confirmDialog.style.display = "none";
+});
+
 async function logout() {
   try {
     const response = await fetch("http://localhost:8080/api/logout", {
@@ -74,5 +82,11 @@ async function deleteUser() {
     }
   } catch (error) {
     alert("Fehler beim Verbinden mit dem Server: " + error.message);
+  } finally {
+    document.getElementById("confirm-dialog").style.display = "none";
   }
+}
+
+function openConfirmDialog() {
+  document.getElementById("confirm-dialog").style.display = "block";
 }

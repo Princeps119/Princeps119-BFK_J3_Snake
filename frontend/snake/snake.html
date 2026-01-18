@@ -13,6 +13,8 @@
 </head>
 
 <body onload="init()">
+
+<!-- Settings Dialog -->
 <div id="settings-dialog">
     <h2>Einstellungen</h2>
 
@@ -35,7 +37,7 @@
 
     <div id="user-actions">
         <button class="logoutBtn" onclick="logout()">Logout</button>
-        <button class="deleteBtn" onclick="deleteUser()">Benutzerkonto löschen</button>
+        <button class="deleteBtn" onclick="openConfirmDialog()">Benutzerkonto löschen</button>
     </div>
 
     <div id="login-dialog">
@@ -48,6 +50,13 @@
     </span>
 
     <button id="saveSettings">Speichern & Schließen</button>
+</div>
+
+<!-- Are you sure dialog -->
+<div id="confirm-dialog">
+    <p>Möchten Sie wirklich Ihr Benutzerkonto löschen? Diese Aktion kann nicht rückgängig gemacht werden.</p>
+    <button id="confirmDelete" onclick="deleteUser()">Ja, Konto löschen</button>
+    <button id="cancelDelete">Abbrechen</button>
 </div>
 
 <main class="main-container">

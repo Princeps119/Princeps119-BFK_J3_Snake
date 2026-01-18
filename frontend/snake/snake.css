@@ -141,7 +141,7 @@ body {
   padding: 24px;
   border-radius: 12px;
   display: none;
-  z-index: 100;
+  z-index: 90;
 }
 
 #settings-dialog h2 {
@@ -218,6 +218,20 @@ body {
   color: #9ad49a;
   text-decoration: none;
   font-weight: 700;
+}
+
+#confirm-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+  max-width: 90%;
+  background: #141414;
+  padding: 24px;
+  border-radius: 12px;
+  display: none;
+  z-index: 100;
 }
 
 @media (max-width: 900px) {
