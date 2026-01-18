@@ -36,7 +36,7 @@
       </select>
 
       <div id="user-actions">
-        <button class="logoutBtn" onclick="logout()">Logout</button>
+        <button class="logoutBtn" onclick="logout()">Ausloggen</button>
         <button class="deleteBtn" onclick="openConfirmDialog()">
           Benutzerkonto löschen
         </button>
@@ -86,10 +86,14 @@
             <div class="score-board">
               <p>Score: <span id="Score">0</span></p>
               <p>Highscore: <span id="highscore">0</span></p>
-              <button id="saveButton" onclick="senddata()" hidden="true">
-                Save Game
-              </button>
-                <button id="loadButton" onclick="loadgame()" hidden="true">Load Game</button>
+              <div class="button-group">
+                <button id="saveButton" onclick="senddata()" hidden="true">
+                  Spiel Speichern
+                </button>
+                <button id="loadButton" onclick="loadgame()" hidden="true">
+                  Spiel Laden
+                </button>
+              </div>
             </div>
 
             <canvas
