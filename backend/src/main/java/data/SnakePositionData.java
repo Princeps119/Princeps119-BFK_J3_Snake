@@ -7,5 +7,5 @@ import java.util.List;
  * @param snakeposition  a list of {@link Position} objects, where each Position holds the x and y coordinates
  *              of a segment of the snake's body in order from head to tail.
  */
-public record SnakePositionData(List<Position> snakeposition, Settings settings, int highscore) {
+public record SnakePositionData(List<Position> snakeposition, Settings settings, int highscore, String snakedirection) {
 }

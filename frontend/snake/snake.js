@@ -224,7 +224,7 @@ async function senddata() {
   };
 
   let test = JSON.stringify({
-    snakeposition: snake, settings: settingsData, highscore: score
+    snakeposition: snake, settings: settingsData, highscore: score, direction: direction
   });
   console.log("Response data:", test);
 
@@ -290,6 +290,9 @@ async function loadgame() {
     console.log("snakeposition: " + JSON.stringify(snake));
     scale = data.settings.gamesize;
     gameSpeedMs = data.settings.gamespeed;
+    snakeX = snake[0].x;
+    snakeY = snake[0].y;
+    direction = data.snakedirection
     reloadgame = setInterval(game, gameSpeedMs);
   } else {
     alert("Save failed: " + response.status);

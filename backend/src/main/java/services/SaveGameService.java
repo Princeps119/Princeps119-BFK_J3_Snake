@@ -73,10 +73,12 @@ public class SaveGameService {
         );
         final int hs = snakeDocs.getInteger("highscore");
 
+        final String snakedirection = snakeDocs.getString("snakedirection");
         return new SnakePositionData(
                 snakePositions,
                 settings,
-                hs
+                hs,
+                snakedirection
         );
     }
 
