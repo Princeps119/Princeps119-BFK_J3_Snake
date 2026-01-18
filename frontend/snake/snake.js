@@ -1,5 +1,6 @@
 // schlangen start variablen
 let snakeColor = "red";
+let isWaiting = false;
 let snakeX = 0;
 let snakeY = 0;
 let snake = [{x: 0, y: 0},
