@@ -1,115 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/snake/Snake_favicon.webp" type="webp/x-icon" />
+    <link rel="stylesheet" href="/snake/snake.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/snake/Snake_favicon.webp" type="webp/x-icon">
-  <link rel="stylesheet" href="/snake/snake.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        crossorigin="anonymous"/>
+    <title>Snake</title>
+  </head>
 
-  <title>Snake</title>
-</head>
+  <body onload="init()">
+    <div id="settings-dialog">
+      <h2>Einstellungen</h2>
 
-<body onload="init()">
-<div id="settings-dialog">
-    <h2>Einstellungen</h2>
-
-    <label for="speed">Geschwindigkeit</label>
-    <select id="speed">
+      <label for="speed">Geschwindigkeit</label>
+      <select id="speed">
         <option value="600">Langsam</option>
         <option value="400" selected>Mittel</option>
         <option value="200">Schnell</option>
         <option value="50">Extrem</option>
         <option value="10">Unspielbar</option>
-    </select>
+      </select>
 
-    <label for="gridSize">Spielfeldgröße</label>
-    <select id="gridSize">
+      <label for="gridSize">Spielfeldgröße</label>
+      <select id="gridSize">
         <option value="20" selected>20 × 20</option>
         <option value="25">25 × 25</option>
         <option value="30">30 × 30</option>
         <option value="60">60 × 60</option>
-    </select>
+      </select>
 
-    <div id="user-actions">
+      <div id="user-actions">
         <button class="logoutBtn" onclick="logout()">Logout</button>
-        <button class="deleteBtn" onclick="deleteUser()">Benutzerkonto löschen</button>
-    </div>
+        <button class="deleteBtn" onclick="openConfirmDialog()">
+          Benutzerkonto löschen
+        </button>
+      </div>
 
-    <div id="login-dialog">
+      <div id="confirm-actions">
+        <p>
+          Möchten Sie wirklich Ihr Benutzerkonto löschen? Diese Aktion kann
+          nicht rückgängig gemacht werden.
+        </p>
+        <button class="deleteBtn" onclick="confirmAction()">
+          Ja, Konto löschen
+        </button>
+        <button class="cancelBtn" onclick="closeConfirmDialog()">
+          Abbrechen
+        </button>
+      </div>
+
+      <div id="login-dialog">
         Noch keinen Account?
         <a href="/login">Anmelden</a>
+      </div>
+
+      <span>
+        Bei Änderung der Werte wird das laufende Spiel automatisch neu
+        gestartet.
+      </span>
+
+      <button id="saveSettings" onclick="closeSettings()">
+        Speichern & Schließen
+      </button>
     </div>
 
-    <span>
-      Bei Änderung der Werte wird das laufende Spiel automatisch neu gestartet.
-    </span>
-
-    <button id="saveSettings">Speichern & Schließen</button>
-</div>
-
-<main class="main-container">
-    <button class="settings-btn" id="openSettings">
+    <main class="main-container">
+      <button class="settings-btn" id="openSettings" onclick="openSettings()">
         <i class="fa-solid fa-gear"></i>
-    </button>
+      </button>
 
-    <header class="header">
+      <header class="header">
         <h1>Snake Spiel 🐍</h1>
         <span>Hallo <span id="username">Spieler</span></span>
-    </header>
+      </header>
 
-    <section class="game-container">
+      <section class="game-container">
         <div class="game-and-info">
-            <div class="game-column">
-                <div class="score-board">
-                    <p>Score: <span id="Score">0</span></p>
-                    <p>Highscore: <span id="highscore">0</span></p>
-                    <button id="saveButton" onclick="senddata()" hidden="true">Save Game</button>
-                    <button id="loadButton" onclick="loadgame()" hidden="true">Load Game</button>
-                </div>
-
-                <canvas id="gameCanvas" width="500" height="500"
-                        style="background: rgb(1, 73, 1); border: 5px solid #000">
-                    Snake Game lädt nicht
-                </canvas>
+          <div class="game-column">
+            <div class="score-board">
+              <p>Score: <span id="Score">0</span></p>
+              <p>Highscore: <span id="highscore">0</span></p>
+              <button id="saveButton" onclick="senddata()" hidden="true">
+                Save Game
+              </button>
+                <button id="loadButton" onclick="loadgame()" hidden="true">Load Game</button>
             </div>
 
-            <aside class="info-column">
-                <div class="info-box">
-                    <h3>Spielanleitung</h3>
+            <canvas
+              id="gameCanvas"
+              width="500"
+              height="500"
+              style="background: rgb(1, 73, 1); border: 5px solid #000"
+            >
+              Snake Game lädt nicht
+            </canvas>
+          </div>
 
-                    <div class="controls">
-                        <h4>Steuerung</h4>
-                        <div class="control-keys">
-                            <span><strong>W</strong> oder <strong>↑</strong> – Nach oben</span>
-                            <span><strong>A</strong> oder <strong>←</strong> – Nach links</span>
-                            <span><strong>S</strong> oder <strong>↓</strong> – Nach unten</span>
-                            <span><strong>D</strong> oder <strong>→</strong> – Nach rechts</span>
-                            <div class="control-keys">
-                            <span><strong>Leertaste</strong> – Pause / Fortsetzen</span>
-                        </div>
-                        </div>
-                    </div>
+          <aside class="info-column">
+            <div class="info-box">
+              <h3>Spielanleitung</h3>
 
-                    <div class="controls">
-                        <h4>Ziel</h4>
-                        <p>
-                            Sammle die grünen Früchte, um Punkte zu erhalten. Vermeide
-                            Wände und den Schlangenkörper, um nicht zu sterben.
-                        </p>
-                    </div>
+              <div class="controls">
+                <h4>Steuerung</h4>
+                <div class="control-keys">
+                  <span
+                    ><strong>W</strong> oder <strong>↑</strong> – Nach
+                    oben</span
+                  >
+                  <span
+                    ><strong>A</strong> oder <strong>←</strong> – Nach
+                    links</span
+                  >
+                  <span
+                    ><strong>S</strong> oder <strong>↓</strong> – Nach
+                    unten</span
+                  >
+                  <span
+                    ><strong>D</strong> oder <strong>→</strong> – Nach
+                    rechts</span
+                  >
+                  <div class="control-keys">
+                    <span><strong>Leertaste</strong> – Pause / Fortsetzen</span>
+                  </div>
                 </div>
-            </aside>
+              </div>
+
+              <div class="controls">
+                <h4>Ziel</h4>
+                <p>
+                  Sammle die grünen Früchte, um Punkte zu erhalten. Vermeide
+                  Wände und den Schlangenkörper, um nicht zu sterben.
+                </p>
+              </div>
+            </div>
+          </aside>
         </div>
-    </section>
+      </section>
+    </main>
 
-</main>
-
-<script src="/snake/snake.js"></script>
-<script src="/snake/eventlisener.js"></script>
-<script src="/snake/main.js"></script>
-</body>
-
+    <script src="/snake/snake.js"></script>
+    <script src="/snake/eventlisener.js"></script>
+    <script src="/snake/main.js"></script>
+  </body>
 </html>
