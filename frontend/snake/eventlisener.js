@@ -1,6 +1,7 @@
 document.addEventListener("keydown", function (event) {
     //anpassung max
     const key = event.key;
+    if (isWaiting) return;
     if (
         key === "w" || key === "W" ||
         key === "a" || key === "A" ||
@@ -49,10 +50,6 @@ document.addEventListener("keydown", function (event) {
 
     if (event.key === " ") {
         if (pause === "true") {
-            if (gameSpeedMs != null) {
-                console.log("in setting gamespseed");
-                gameSpeedMs = 400;
-            }
             console.log("gamespeed", gameSpeedMs)
             reloadgame = setInterval(game, gameSpeedMs);
             pause = "false";
@@ -62,4 +59,12 @@ document.addEventListener("keydown", function (event) {
             pause = "true";
         }
     }
+
+     isWaiting = true;
+
+    setTimeout(()=>{
+        isWaiting=false;
+
+
+    },gameSpeedMs);
 });

@@ -224,9 +224,11 @@ public class MainController {
         if (method.equals(PATCH) && exchange.getRequestHeaders().get("Content-Type").contains(CONTENT_TYPE_JSON)) {
             if (exchange.getRequestBody() != null) {
                 try {
+
                     final SaveGameService saveService = SaveGameService.getInstance();
                     final SnakePositionData snakeData = readJSON(exchange, SnakePositionData.class);
                     final boolean result = saveService.saveSnakePosition(exchange, snakeData);
+
                     if (result) {
                         exchange.sendResponseHeaders(200, -1);
                         exchange.close();

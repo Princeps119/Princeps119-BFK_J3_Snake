@@ -1,5 +1,6 @@
 // schlangen start variablen
 let snakeColor = "red";
+let isWaiting = false;
 let snakeX = 0;
 let snakeY = 0;
 let snake = [{x: 0, y: 0},
@@ -167,7 +168,7 @@ function snake_generate(snake) {
 function Snake_eat() {
   if (snakeX == foodX && snakeY == foodY) {
     score = score + 1;
-    document.getElementById("Score").innerHTML = "Score: " + score;
+    document.getElementById("Score").innerHTML = score;
     snake.push(zwischen);
     snake_generate(snake);
     generateNewFood();
@@ -216,11 +217,15 @@ function checkSnakeCollision() {
   }
 }
 
+
 async function senddata() {
 
+  const settingsData = {
+    gamesize: scale, gamespeed: gameSpeedMs
+  };
 
   let test = JSON.stringify({
-    snakeposition: snake,
+    snakeposition: snake, settings: settingsData, highscore: score, direction: direction
   });
   console.log("Response data:", test);
 
@@ -231,8 +236,7 @@ async function senddata() {
       Authorization: "Bearer " + storedDataForSnake,
     },
     body: JSON.stringify({
-      snakeposition: snake,
-
+      snakeposition: snake, settings: settingsData, highscore: score
     }),
   });
 
@@ -244,9 +248,10 @@ async function senddata() {
 }
 
 if (storedDataForSnake) {
-  let button = document.getElementById("saveButton");
-  button.removeAttribute("hidden");
-  button.color.white = "#FFFFFF";
+  let saveButton = document.getElementById("saveButton");
+  saveButton.removeAttribute("hidden");
+  let loadButton = document.getElementById("loadButton");
+  loadButton.removeAttribute("hidden");
 }
 
 function resetGameState() {
@@ -261,4 +266,36 @@ function resetGameState() {
     score = 0;
     document.getElementById("Score").innerHTML = "Score: " + score;
     generateNewFood();
+}
+
+async function loadgame() {
+
+  let test = JSON.stringify({
+    snakeposition: snake,
+  });
+  console.log("Response data:", test);
+
+  const response = await fetch("http://localhost:8080/api/load", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + storedDataForSnake,
+    },
+  })
+  if (response.ok) { // true for status 200-299
+    alert("Load successful!");
+    clearInterval(reloadgame);
+    const data = await response.json();
+    console.log(data);
+    snake = data.snakeposition;
+    console.log("snakeposition: " + JSON.stringify(snake));
+    scale = data.settings.gamesize;
+    gameSpeedMs = data.settings.gamespeed;
+    snakeX = snake[0].x;
+    snakeY = snake[0].y;
+    direction = data.snakedirection
+    reloadgame = setInterval(game, gameSpeedMs);
+  } else {
+    alert("Save failed: " + response.status);
+  }
 }
