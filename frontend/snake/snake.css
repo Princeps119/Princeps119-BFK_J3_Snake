@@ -9,7 +9,6 @@ body {
   align-items: center;
   background-image: url("/snake/snake_images/black-scales.webp");
   background-repeat: repeat;
-
 }
 
 .main-container {
@@ -73,7 +72,7 @@ body {
   border-radius: 8px;
   margin-bottom: 16px;
   width: 100%;
-  max-width: 400px;
+  max-width: 470px;
 }
 
 .score-board p {
@@ -85,6 +84,22 @@ body {
 
 .score-board p:last-child {
   margin-bottom: 0;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.button-group button {
+  padding: 10px;
+  min-width: 150px;
+  border-radius: 8px;
+  background: #014901;
+  color: #fff;
+  border: 1px solid #333;
+  cursor: pointer;
 }
 
 #gameCanvas {
@@ -141,7 +156,7 @@ body {
   padding: 24px;
   border-radius: 12px;
   display: none;
-  z-index: 100;
+  z-index: 90;
 }
 
 #settings-dialog h2 {
@@ -218,6 +233,30 @@ body {
   color: #9ad49a;
   text-decoration: none;
   font-weight: 700;
+}
+
+#confirm-actions {
+  display: none;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#confirm-actions button {
+  padding: 10px;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+#confirm-actions .deleteBtn {
+  background-color: #d40000;
+  border-color: rgba(255, 0, 0, 0.4);
+}
+
+#confirm-actions p {
+  color: #d40000;
 }
 
 @media (max-width: 900px) {
