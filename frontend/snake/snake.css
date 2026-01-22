@@ -7,7 +7,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("/snake/black-scales.webp");
+  background-image: url("/snake/snake_images/black-scales.webp");
   background-repeat: repeat;
 }
 

@@ -1,15 +1,13 @@
 <!doctype html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/snake/Snake_favicon.webp" type="webp/x-icon" />
-    <link rel="stylesheet" href="/snake/snake.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      crossorigin="anonymous"
-    />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/snake/snake_images/Snake_favicon.webp" type="webp/x-icon">
+  <link rel="stylesheet" href="/snake/snake.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        crossorigin="anonymous"/>
 
     <title>Snake</title>
   </head>
@@ -96,15 +94,12 @@
               </div>
             </div>
 
-            <canvas
-              id="gameCanvas"
-              width="500"
-              height="500"
-              style="background: rgb(1, 73, 1); border: 5px solid #000"
-            >
-              Snake Game lädt nicht
-            </canvas>
-          </div>
+                <canvas id="gameCanvas" width="500" height="500"
+                        style="background: url('/snake/snake_images/Snake_Ground.webp') no-repeat center/cover;
+               border: 5px solid #000">
+                    Snake Game lädt nicht
+                </canvas>
+            </div>
 
           <aside class="info-column">
             <div class="info-box">
@@ -138,7 +133,7 @@
               <div class="controls">
                 <h4>Ziel</h4>
                 <p>
-                  Sammle die grünen Früchte, um Punkte zu erhalten. Vermeide
+                  Sammle die roten Kristalle, um Punkte zu erhalten. Vermeide
                   Wände und den Schlangenkörper, um nicht zu sterben.
                 </p>
               </div>

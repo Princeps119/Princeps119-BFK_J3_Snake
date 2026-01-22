@@ -11,7 +11,8 @@ let zwischen = [{}];
 
 let storedDataForSnake = sessionStorage.getItem("userData");
 
-let foodColor = "green";
+let foodColor = new Image();
+foodColor.src = "./snake/snake_images/Snake_Food_red.webp";
 let foodX = 10;
 let foodY = 10;
 
@@ -128,7 +129,15 @@ function move(direction) {
   }
 }
 
-function food(x, y, color) {
+foodColor.onload = function ()
+{
+};
+foodColor.onerror = function ()
+{
+  console.error("Fehler beim Laden des WebP-Bildes.");
+};
+
+function food(x, y, foodColor) {
 
   const canvas = document.getElementById("gameCanvas");
   let canvash = (canvas.attributes.height.value);
@@ -136,11 +145,15 @@ function food(x, y, color) {
   const playgroundh = parseInt(canvash) / scale;
   const playgroundw = parseInt(canvasw) / scale;
   const ctx = canvas.getContext("2d");
-  ctx.beginPath();
-  ctx.rect(x * playgroundh, y * playgroundw, playgroundh, playgroundw);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.closePath();
+  // ctx.beginPath();
+    // ctx.rect(x * playgroundh, y * playgroundw, playgroundh, playgroundw);
+  // ctx.fillStyle = color;
+  // ctx.fill();
+  // ctx.closePath();
+  if ( foodColor.complete) {
+    ctx.drawImage(foodColor, x * playgroundh, y * playgroundw, playgroundh, playgroundw);
+  }
+
 
 }
 
